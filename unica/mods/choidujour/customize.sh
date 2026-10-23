@@ -8,7 +8,7 @@ fi
 
 ADD_TO_WORK_DIR "$MODPATH" "system" "." 0 0 755 "u:object_r:system_file:s0"
 
-LOG "- Patching /system/system/etc/security/otacerts.zip"
+LOG "- ?? ?: /system/system/etc/security/otacerts.zip"
 EVAL "rm \"$WORK_DIR/system/system/etc/security/otacerts.zip\""
 EVAL "cd \"$SRC_DIR\"; zip -q \"$WORK_DIR/system/system/etc/security/otacerts.zip\" \"./security/unica_ota.x509.pem\""
 
@@ -32,11 +32,11 @@ while IFS= read -r f; do
 
     if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f" ] || \
             [[ "$f" != *".xml" ]]; then
-        LOG "- Adding \"$f\" to /system/system/priv-app/SecSettings.apk"
+        LOG "- ?? ?: \"$f\" to /system/system/priv-app/SecSettings.apk"
         EVAL "mkdir -p \"$(dirname "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f")\""
         EVAL "cp -a \"$MODPATH/SecSettings.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/${f//\$/\\$}\""
     else
-        LOG "- Patching \"$f\" in /system/system/priv-app/SecSettings.apk"
+        LOG "- ?? ?: \"$f\" in /system/system/priv-app/SecSettings.apk"
         if [[ "$f" == *"res/values"* ]]; then
             PATCH_INST="/<\/resources>/i"
             CONTENT="$(sed -e "/?xml/d" -e "/resources>/d" "$MODPATH/SecSettings.apk/$f")"

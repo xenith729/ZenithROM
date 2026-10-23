@@ -9,8 +9,7 @@ KERNEL_BINS="dt dtbo init_boot vendor_boot"
 # shellcheck disable=SC2034
 PARTITIONS_LIST="system vendor product system_ext odm vendor_dlkm odm_dlkm system_dlkm"
 
-_GET_PARTITION_SIZE()
-{
+_GET_PARTITION_SIZE() {
     local PARTITION_NAME="$1"
 
     local PARTITION_SIZE
@@ -21,10 +20,9 @@ _GET_PARTITION_SIZE()
 }
 # ]
 
-# GET_DEVICE_FROM_MOUNTPOINT <mountpoint>
-# Returns the device path for the supplied mountpoint.
-GET_DEVICE_FROM_MOUNTPOINT()
-{
+# GET_DEVICE_FROM_MOUNTPOINT <마운트 포인트>
+# 지정된 마운트 포인트에 대한 디바이스 경로를 반환합니다.
+GET_DEVICE_FROM_MOUNTPOINT() {
     _CHECK_NON_EMPTY_PARAM "MOUNTPOINT" "$1" || return 1
 
     local MOUNTPOINT="$1"
@@ -38,7 +36,7 @@ GET_DEVICE_FROM_MOUNTPOINT()
         fi
     fi
     if [ ! -f "$FSTAB_FILE" ]; then
-        LOGE "File not found: target/$TARGET_CODENAME/installer/recovery.fstab"
+        LOGE "파일이 존재하지 않습니다: target/$TARGET_CODENAME/installer/recovery.fstab"
         exit 1
     fi
 
@@ -57,7 +55,7 @@ GET_DEVICE_FROM_MOUNTPOINT()
             elif [[ "$MOUNTPOINT" == "/system" ]]; then
                 GET_DEVICE_FROM_MOUNTPOINT "/"
             else
-                LOGW "No entry for \"$MOUNTPOINT\" found in target fstab"
+                LOGW "target fstab에 \"$MOUNTPOINT\"에 대한 엔트리가 존재하지 않습니다."
                 exit 1
             fi
         else
@@ -66,10 +64,9 @@ GET_DEVICE_FROM_MOUNTPOINT()
     fi
 }
 
-# PRINT_ASSERTIONS <info>
-# Returns the assertions code text to be used in the updater-script file.
-PRINT_ASSERTIONS()
-{
+# PRINT_ASSERTIONS <정보>
+# updater-script 파일에 사용할 코드 텍스트를 반환합니다.
+PRINT_ASSERTIONS() {
     _CHECK_NON_EMPTY_PARAM "BUILD_INFO" "$1" || return 1
 
     local BUILD_INFO="$1"
@@ -99,7 +96,7 @@ PRINT_ASSERTIONS()
     fi
 
     if [ ! -d "$SRC_DIR/target/$DEVICE" ]; then
-        LOGE "Folder not found: target/$DEVICE"
+        LOGE "폴더가 존재하지 않습니다: target/$DEVICE"
         return 1
     fi
 
@@ -108,11 +105,10 @@ PRINT_ASSERTIONS()
     fi
 }
 
-# PRINT_BUILD_INFO <info> [info]
-# Returns the text to be used in the build_info.txt file.
-# Both source and target info can be passed for incremental zips.
-PRINT_BUILD_INFO()
-{
+# PRINT_BUILD_INFO <정도> [정보]
+# build_info.txt 파일에 사용할 텍스트를 반환합니다.
+# 증분 zip 파일의 경우, 소스 및 타겟의 정보를 모두 전달할 수 있습니다.
+PRINT_BUILD_INFO() {
     local SOURCE_BUILD_INFO
     local TARGET_BUILD_INFO
 
@@ -142,10 +138,9 @@ PRINT_BUILD_INFO()
     fi
 }
 
-# PRINT_HEADER <info>
-# Returns the header text to be used in the updater-script file.
-PRINT_HEADER()
-{
+# PRINT_HEADER <정보>
+# updater-script 파일에 사용할 헤더 텍스트를 반환합니다.
+PRINT_HEADER() {
     _CHECK_NON_EMPTY_PARAM "BUILD_INFO" "$1" || return 1
 
     local BUILD_INFO="$1"
@@ -177,9 +172,11 @@ PRINT_HEADER()
     echo    'ui_print(" ");'
     PRINT_SEPARATOR
     echo -n 'ui_print("'
-    echo -n "UN1CA $ROM_VERSION for $TARGET_NAME"
+    echo -n "ZenithROM $ROM_VERSION for $TARGET_NAME"
     echo    '");'
-    echo    'ui_print("Coded by salvo_giangri @XDAforums");'
+    echo    'ui_print("ZenithROM developed by Xenith");'
+    echo    '");'
+    echo    'ui_print("UN1CA developed by salvo_giangri @XDAforums");'
     PRINT_SEPARATOR
     echo -n 'ui_print("'
     echo -n "One UI version: $ONEUI_VERSION"
@@ -194,17 +191,15 @@ PRINT_HEADER()
 }
 
 # PRINT_SEPARATOR
-# Returns the separator text to be used in the updater-script file.
-PRINT_SEPARATOR()
-{
+# updater-script 파일에 사용할 구분자 텍스트를 반환합니다.
+PRINT_SEPARATOR() {
     echo 'ui_print("****************************************");'
 }
 
-# SIGN_IMAGE_WITH_AVB <file>
-# Signs the supplied image with avbtool if not AVB-signed already.
-# The TARGET_${PARTITION_NAME}_PARTITION_SIZE environment variable is required to be set.
-SIGN_IMAGE_WITH_AVB()
-{
+# SIGN_IMAGE_WITH_AVB <파일>
+# 제공된 이미지가 아직 AVB로 서명되지 않은 경우, avbtool을 사용하여 해당 이미지를 AVB로 서명합니다.
+# TARGET_${PARTITION_NAME}_PARTITION_SIZE 환경 변수가 설정되어 있어야 합니다.
+SIGN_IMAGE_WITH_AVB() {
     _CHECK_NON_EMPTY_PARAM "FILE" "$1" || return 1
 
     local FILE="$1"
@@ -225,7 +220,7 @@ SIGN_IMAGE_WITH_AVB()
         CMD+="--algorithm \"SHA256_RSA4096\" "
         CMD+="--key \"$SRC_DIR/security/avb/testkey_rsa4096.pem\""
 
-        LOG "- Signing image with AVB"
+        LOG "- AVB로 이미지 서명 중..."
         EVAL "$CMD" || return 1
     fi
 }

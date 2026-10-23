@@ -24,7 +24,7 @@ COMPRESS_WEBP()
         fi
     fi
 
-    LOG "- Compressing $FILE_NAME"
+    LOG "- ?? ?: $FILE_NAME"
 
     CMD="cwebp"
     CMD+=" -q 100"
@@ -51,7 +51,7 @@ ENCODE_MP4()
         RES="1440:-1"
     fi
 
-    LOG "- Encoding $FILE_NAME"
+    LOG "- ??? ?: $FILE_NAME"
 
     CMD="ffmpeg"
     CMD+=" -i \"$FILE_PATH/$FILE_NAME\""
@@ -80,7 +80,7 @@ done
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw/video_"*.mp4; do
     ENCODE_MP4 "$f"
 done
-LOG "- Downloading latest Samsung Wallpaper app"
+LOG "- ???? ?: latest Samsung Wallpaper app"
 DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "000008552712")" \
     "$WORK_DIR/system/system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"
 APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \

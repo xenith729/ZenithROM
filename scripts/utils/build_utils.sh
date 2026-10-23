@@ -5,45 +5,25 @@
 source "$SRC_DIR/scripts/utils/common_utils.sh"
 # ]
 
-# GET_DISK_USAGE <file>
-# Returns the size in bytes of the supplied file.
-GET_DISK_USAGE()
-{
+# GET_DISK_USAGE <파일>
+GET_DISK_USAGE() {
     _CHECK_NON_EMPTY_PARAM "FILE" "$1" || return 1
-
     local FILE="$1"
-
-    if [ ! -e "$FILE" ]; then
-        LOGE "File not found: ${FILE//$SRC_DIR\//}"
-        return 1
-    fi
-
-    local SIZE
-    # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_image.py#63
-    SIZE="$(du -b -k -s "$FILE" | cut -f 1)"
-
+    [ -e "$FILE" ] || { LOGE "파일이 존재하지 않습니다: ${FILE//$SRC_DIR\//}"; return 1; }
+    
+    local SIZE="$(du -b -k -s "$FILE" | cut -f 1)"
     bc -l <<< "$SIZE * 1024"
 }
 
-# GET_IMAGE_SIZE <file>
-# Returns the size in bytes of the supplied image.
-GET_IMAGE_SIZE()
-{
+# GET_IMAGE_SIZE <파일>
+GET_IMAGE_SIZE() {
     _CHECK_NON_EMPTY_PARAM "FILE" "$1" || return 1
-
     local FILE="$1"
-
-    if [ ! -f "$FILE" ]; then
-        LOGE "File not found: ${FILE//$SRC_DIR\//}"
-        return 1
-    fi
+    [ -f "$FILE" ] || { LOGE "파일이 존재하지 않습니다: ${FILE//$SRC_DIR\//}"; return 1; }
 
     if IS_SPARSE_IMAGE "$FILE"; then
-        local BLOCK_SIZE
-        local BLOCKS
-        BLOCK_SIZE="$(printf "%d" "0x$(READ_BYTES_AT "$FILE" "12" "4")")"
-        BLOCKS="$(printf "%d" "0x$(READ_BYTES_AT "$FILE" "16" "4")")"
-
+        local BLOCK_SIZE="$(printf "%d" "0x$(READ_BYTES_AT "$FILE" "12" "4")")"
+        local BLOCKS="$(printf "%d" "0x$(READ_BYTES_AT "$FILE" "16" "4")")"
         bc -l <<< "$BLOCKS * $BLOCK_SIZE"
     else
         GET_DISK_USAGE "$FILE"
@@ -60,14 +40,14 @@ DEPENDENCIES=(
     "sudo" "tail" "tar" "touch" "tr" "truncate" "umount" "unzip"
     "wc" "whoami" "xargs" "xxd" "zip" "zstd"
 )
+
 MISSING=()
 for d in "${DEPENDENCIES[@]}"; do
-    if ! type "$d" &> /dev/null; then
-        MISSING+=("$d")
-    fi
+    type "$d" &> /dev/null || MISSING+=("$d")
 done
-if [ "${#MISSING[@]}" -ne 0 ]; then
-    echo -e '\033[1;31m'"The following dependencies are missing from your system:"'\033[0;31m' >&2
+
+if [ ${#MISSING[@]} -ne 0 ]; then
+    echo -e '\033[1;31m다음 종속성이 시스템에 설치되어 있지 않습니다:\033[0;31m' >&2
     printf '%s ' "${MISSING[@]}" >&2
     echo -e '\033[0m' >&2
     return 1
@@ -75,7 +55,7 @@ fi
 unset DEPENDENCIES MISSING
 
 if ! "$SRC_DIR/external/make.sh" --check-tools; then
-    LOG_STEP_IN true "Building required tools..."
+    LOG_STEP_IN true "필요한 도구 빌드 중..."
     "$SRC_DIR/external/make.sh" || return 1
     LOG_STEP_OUT
 fi

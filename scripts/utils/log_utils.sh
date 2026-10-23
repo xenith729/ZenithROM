@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # [
-_GET_CALLER_INFO()
-{
+_GET_CALLER_INFO() {
     if [[ "${FUNCNAME[2]}" != "main" ]]; then
         echo -n "("
         if [ "${BASH_SOURCE[3]}" ]; then
@@ -26,39 +25,35 @@ _GET_CALLER_INFO()
 }
 # ]
 
-# LOG <message>
-# Prints a log message in the build output.
-LOG()
-{
+# LOG <메세지>
+# 빌드 출력에 로그 메세지를 출력합니다.
+LOG() {
     local INDENT="${INDENT_LEVEL:=0}"
 
     echo -e "$(printf "%*s%s" "$INDENT" "" "$1")"
 }
 
-# LOGE <message>
-# Prints an error log message in the build output.
-LOGE()
-{
+# LOGE <메세지>
+# 빌드 출력에 오류 로그 메세지를 출력합니다.
+LOGE() {
     local RED="\033[0;31m"
     local RESET="\033[0m"
 
     echo -e "${RED}$(_GET_CALLER_INFO)${1}${RESET}" >&2
 }
 
-# LOGW <message>
-# Prints a warning log message in the build output.
-LOGW()
-{
+# LOGW <메세지>
+# 빌드 출력에 경고 로그 메세지를 출력합니다.
+LOGW() {
     local YELLOW="\033[0;33m"
     local RESET="\033[0m"
 
     echo -e "${YELLOW}$(_GET_CALLER_INFO)${1}${RESET}" >&2
 }
 
-# LOG_STEP_IN <bold> <message>
-# Increments the output indentation, additionally prints a log message if supplied.
-LOG_STEP_IN()
-{
+# LOG_STEP_IN <볼드> <메세지>
+# 출력 들여쓰기 단계를 높이며, 지정된 경우 로그 메시지도 함께 출력합니다.
+LOG_STEP_IN() {
     local BOLD
     local RESET="\033[0m"
 
@@ -76,9 +71,8 @@ LOG_STEP_IN()
 }
 
 # LOG_STEP_OUT
-# Reduces the output indentation.
-LOG_STEP_OUT()
-{
+# 출력 들여쓰기 단계를 줄입니다.
+LOG_STEP_OUT() {
     local INDENT="${INDENT_LEVEL:=0}"
     if [ "$INDENT_LEVEL" -gt 0 ]; then
         export INDENT_LEVEL=$((INDENT - 2))

@@ -220,18 +220,18 @@ APPLY_CUSTOM_FEATURE()
 }
 # ]
 
-LOG_STEP_IN "- Applying target floating feature config"
+LOG_STEP_IN "- ?? ?: target floating feature config"
 APPLY_TARGET_FEATURE
 LOG_STEP_OUT
 
 if [ -f "$SRC_DIR/platform/$TARGET_PLATFORM/sff.sh" ]; then
-    LOG_STEP_IN "- Applying custom platform floating feature config"
+    LOG_STEP_IN "- ?? ?: custom platform floating feature config"
     APPLY_CUSTOM_FEATURE "$SRC_DIR/platform/$TARGET_PLATFORM/sff.sh"
     LOG_STEP_OUT
 fi
 
 if [ -f "$SRC_DIR/target/$TARGET_CODENAME/sff.sh" ]; then
-    LOG_STEP_IN "- Applying custom device floating feature config"
+    LOG_STEP_IN "- ?? ?: custom device floating feature config"
     APPLY_CUSTOM_FEATURE "$SRC_DIR/target/$TARGET_CODENAME/sff.sh"
     LOG_STEP_OUT
 fi

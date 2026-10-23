@@ -96,7 +96,7 @@ SOURCE_FILE_ATTR="$(grep -F ".source" "$APKTOOL_DIR/system/framework/services.ja
 SOURCE_FILE_ATTR="${SOURCE_FILE_ATTR//\./\\\.}"
 SOURCE_FILE_ATTR="${SOURCE_FILE_ATTR//\"/\\\"}"
 SOURCE_FILE_ATTR="${SOURCE_FILE_ATTR//\//\\\/}"
-LOG "- Replacing SourceFile attribute in /system/system/framework/services.jar"
+LOG "- ?? ?: SourceFile attribute in /system/system/framework/services.jar"
 find "$APKTOOL_DIR/system/framework/services.jar" -type f -name "*.smali" -print0 \
     | xargs -0 -I "{}" -P "$(nproc)" sed -i "s/^\.source.*/\.source \"SourceFile\"/g" "{}"
 if [[ "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" != "$TARGET_PRODUCT_SHIPPING_API_LEVEL" ]]; then
@@ -327,7 +327,7 @@ fi
 # SEC_PRODUCT_FEATURE_KNOX_SUPPORT_UCS
 # SEC_PRODUCT_FEATURE_FRAMEWORK_SUPPORT_MOBILE_PAYMENT
 
-LOG "- Restoring original SourceFile attribute in /system/system/framework/services.jar"
+LOG "- ?? ?: original SourceFile attribute in /system/system/framework/services.jar"
 find "$APKTOOL_DIR/system/framework/services.jar" -type f -name "*.smali" -print0 \
     | xargs -0 -I "{}" -P "$(nproc)" sed -i "s/^\.source.*/$SOURCE_FILE_ATTR/g" "{}"
 

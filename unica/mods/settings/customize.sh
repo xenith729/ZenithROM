@@ -42,7 +42,7 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     'ro.product.model' \
     'ro.boot.em.model'
 
-LOG_STEP_IN "- Adding UN1CA Settings"
+LOG_STEP_IN "- ?? ?: UN1CA Settings"
 
 # Dynamically patch SecSettings
 # - Add missing/non-xml files in place
@@ -54,11 +54,11 @@ while IFS= read -r f; do
 
     if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f" ] || \
             [[ "$f" != *".xml" ]]; then
-        LOG "- Adding \"$f\" to /system/system/priv-app/SecSettings.apk"
+        LOG "- ?? ?: \"$f\" to /system/system/priv-app/SecSettings.apk"
         EVAL "mkdir -p \"$(dirname "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f")\""
         EVAL "cp -a \"$MODPATH/SecSettings.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/${f//\$/\\$}\""
     else
-        LOG "- Patching \"$f\" in /system/system/priv-app/SecSettings.apk"
+        LOG "- ?? ?: \"$f\" in /system/system/priv-app/SecSettings.apk"
         if [[ "$f" == *"res/values"* ]]; then
             PATCH_INST="/<\/resources>/i"
             CONTENT="$(sed -e "/?xml/d" -e "/resources>/d" "$MODPATH/SecSettings.apk/$f")"
@@ -73,13 +73,13 @@ while IFS= read -r f; do
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
 # Add UN1CA Settings SearchIndexableData registrations
-LOG "- Patching \"smali/com/android/settingslib/search/SearchIndexableResourcesMobile.smali\" in /system/system/priv-app/SecSettings.apk"
+LOG "- ?? ?: \"smali/com/android/settingslib/search/SearchIndexableResourcesMobile.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali/com/android/settingslib/search/SearchIndexableResourcesMobile.smali" "replaceall" \
     '.class public final Lcom/android/settingslib/search/SearchIndexableResourcesMobile;' \
     '.class public Lcom/android/settingslib/search/SearchIndexableResourcesMobile;' \
     > /dev/null
-LOG "- Patching \"smali/com/android/settings/search/SearchFeatureProviderImpl\$\$ExternalSyntheticLambda0.smali\" in /system/system/priv-app/SecSettings.apk"
+LOG "- ?? ?: \"smali/com/android/settings/search/SearchFeatureProviderImpl\$\$ExternalSyntheticLambda0.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali/com/android/settings/search/SearchFeatureProviderImpl\$\$ExternalSyntheticLambda0.smali" "replace" \
     'invoke()Ljava/lang/Object;' \
@@ -94,7 +94,7 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     > /dev/null
 
 DECODE_APK "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
-LOG "- Patching \"smali_classes2/com/samsung/android/settings/intelligence/search/categorizing/TopLevelKeysCollector.smali\" in /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
+LOG "- ?? ?: \"smali_classes2/com/samsung/android/settings/intelligence/search/categorizing/TopLevelKeysCollector.smali\" in /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk" \
     "smali_classes2/com/samsung/android/settings/intelligence/search/categorizing/TopLevelKeysCollector.smali" "replace" \
     '<init>(Landroid/content/Context;)V' \

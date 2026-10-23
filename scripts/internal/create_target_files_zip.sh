@@ -8,8 +8,7 @@ source "$SRC_DIR/scripts/utils/install_utils.sh" || exit 1
 trap 'rm -rf "$TMP_DIR"' EXIT INT
 
 # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_super_image.py#72
-BUILD_SUPER_EMPTY()
-{
+BUILD_SUPER_EMPTY() {
     local CMD
 
     CMD="lpmake"
@@ -50,8 +49,7 @@ BUILD_SUPER_EMPTY()
     EVAL "$CMD" || exit 1
 }
 
-GENERATE_BUILD_INFO()
-{
+GENERATE_BUILD_INFO() {
     local BUILD_INFO_FILE="$TMP_DIR/build_info.txt"
 
     local SOURCE_FIRMWARE_PATH
@@ -69,13 +67,13 @@ GENERATE_BUILD_INFO()
 
     {
         echo -n "device="
-        [ "$(GET_PROP "system" "ro.unica.device")" ] && GET_PROP "system" "ro.unica.device" || echo "$TARGET_CODENAME"
+        [ "$(GET_PROP "system" "ro.zenith.device")" ] && GET_PROP "system" "ro.zenith.device" || echo "$TARGET_CODENAME"
         [ "$TARGET_ASSERT_MODEL" ] && echo "model=${TARGET_ASSERT_MODEL//:/;}"
         echo "name=$TARGET_NAME"
         echo -n "version="
-        [ "$(GET_PROP "system" "ro.unica.version")" ] && GET_PROP "system" "ro.unica.version" || echo "$ROM_VERSION"
+        [ "$(GET_PROP "system" "ro.zenith.version")" ] && GET_PROP "system" "ro.zenith.version" || echo "$ROM_VERSION"
         echo -n "timestamp="
-        [ "$(GET_PROP "system" "ro.unica.timestamp")" ] && GET_PROP "system" "ro.unica.timestamp" || echo "$ROM_BUILD_TIMESTAMP"
+        [ "$(GET_PROP "system" "ro.zenith.timestamp")" ] && GET_PROP "system" "ro.zenith.timestamp" || echo "$ROM_BUILD_TIMESTAMP"
         echo "os_version=$(GET_PROP "system" "ro.build.version.release")"
         echo "oneui_version=$(GET_PROP "system" "ro.build.version.oneui")"
         echo "build_incremental=$(GET_PROP "system" "ro.build.version.incremental")"
@@ -92,8 +90,7 @@ GENERATE_BUILD_INFO()
     } > "$BUILD_INFO_FILE"
 }
 
-GET_SUPER_GROUP_SIZE()
-{
+GET_SUPER_GROUP_SIZE() {
     local GROUP_NAME="$TARGET_SUPER_GROUP_NAME"
     GROUP_NAME="$(tr "[:lower:]" "[:upper:]" <<< "$TARGET_SUPER_GROUP_NAME")"
 
@@ -106,7 +103,7 @@ GET_SUPER_GROUP_SIZE()
 # ]
 
 if [ "$#" != "1" ]; then
-    echo "Usage: create_target_files_zip <output>" >&2
+    echo "사용 예제: create_target_files_zip <출력>" >&2
     exit 1
 fi
 
@@ -115,7 +112,7 @@ OUTPUT_FILE="$1"
 [ -d "$TMP_DIR" ] && rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
 
-LOG_STEP_IN "- Building OS partitions"
+LOG_STEP_IN "- OS 파티션 빌드 중..."
 while IFS= read -r f; do
     PARTITION=$(basename "$f")
     IS_VALID_PARTITION_NAME "$PARTITION" || continue
@@ -135,7 +132,7 @@ done < <(find "$WORK_DIR" -maxdepth 1 -type d)
 LOG_STEP_OUT
 
 if $TARGET_USE_DYNAMIC_PARTITIONS; then
-    LOG "- Building unsparse_super_empty.img"
+    LOG "- unsparse_super_empty.img 빌드 중..."
     BUILD_SUPER_EMPTY
 fi
 
@@ -145,7 +142,7 @@ if [ -d "$WORK_DIR/kernel" ]; then
     for f in $KERNEL_BINS; do
         [ ! -f "$WORK_DIR/kernel/$f" ] && continue
 
-        LOG_STEP_IN "- Copying $f"
+        LOG_STEP_IN "- $f 복사 중..."
         EVAL "cp -a \"$WORK_DIR/kernel/$f\" \"$TMP_DIR/$f\"" || exit 1
         if ! $TARGET_DISABLE_AVB_SIGNING; then
             SIGN_IMAGE_WITH_AVB "$TMP_DIR/$f" || exit 1
@@ -154,10 +151,10 @@ if [ -d "$WORK_DIR/kernel" ]; then
     done
 fi
 
-LOG "- Generating build_info.txt"
+LOG "- build_info.txt 생성 중..."
 GENERATE_BUILD_INFO
 
-LOG "- Creating zip"
+LOG "- zip 생성 중..."
 rm -f "$OUTPUT_FILE"
 EVAL "cd \"$TMP_DIR\" && 7z a -tzip -mx=3 -mmt=$(nproc) -mtc=off -mtm=off \"$OUTPUT_FILE\" -r *" || exit 1
 

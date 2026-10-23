@@ -1,6 +1,6 @@
 DECODE_APK "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk"
 
-LOG "- Enabling navigation bar type settings step"
+LOG "- ??? ?: navigation bar type settings step"
 SMALI_PATCH "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk" \
     "smali/S2/f.smali" "replace" \
     "d(Landroid/content/Context;Z)Ljava/util/ArrayList;" \
@@ -14,7 +14,7 @@ SMALI_PATCH "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Globa
     "this_string_does_not_exist" \
     > /dev/null
 
-LOG "- Disabling Recommended apps step"
+LOG "- ???? ?: Recommended apps step"
 EVAL "sed -i \"/omcagent/d\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/res/values/arrays.xml\""
 
 # Dynamically patch SecSetupWizard_Global
@@ -27,11 +27,11 @@ while IFS= read -r f; do
 
     if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/$f" ] || \
             [[ "$f" != *".xml" ]]; then
-        LOG "- Adding \"$f\" to /system/system/priv-app/SecSetupWizard_Global.apk"
+        LOG "- ?? ?: \"$f\" to /system/system/priv-app/SecSetupWizard_Global.apk"
         EVAL "mkdir -p \"$(dirname "$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/$f")\""
         EVAL "cp -a \"$MODPATH/SecSetupWizard_Global.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/${f//\$/\\$}\""
     else
-        LOG "- Patching \"$f\" in /system/system/priv-app/SecSetupWizard_Global.apk"
+        LOG "- ?? ?: \"$f\" in /system/system/priv-app/SecSetupWizard_Global.apk"
         if [[ "$f" == *"res/values"* ]]; then
             PATCH_INST="/<\/resources>/i"
             CONTENT="$(sed -e "/?xml/d" -e "/resources>/d" "$MODPATH/SecSetupWizard_Global.apk/$f")"

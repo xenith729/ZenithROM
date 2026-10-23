@@ -8,12 +8,11 @@ source "$SRC_DIR/scripts/utils/build_utils.sh" || exit 1
 SOURCE_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$SOURCE_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$SOURCE_FIRMWARE")"
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 
-COPY_SOURCE_FIRMWARE()
-{
+COPY_SOURCE_FIRMWARE() {
     local SOURCE_FOLDERS="product system"
     for f in $SOURCE_FOLDERS; do
         if [ -d "$FW_DIR/$SOURCE_FIRMWARE_PATH/$f" ]; then
-            LOG "- Copying /$f from source firmware"
+            LOG "- 소스 펌웨어에서 /$f 복사 중..."
             EVAL "rsync -a --mkpath --delete --exclude=\"*system_ext*\" \"$FW_DIR/$SOURCE_FIRMWARE_PATH/$f\" \"$WORK_DIR\"" || exit 1
             sed "/system_ext/d" "$FW_DIR/$SOURCE_FIRMWARE_PATH/file_context-$f" > "$WORK_DIR/configs/file_context-$f"
             sed "/system_ext/d" "$FW_DIR/$SOURCE_FIRMWARE_PATH/fs_config-$f" > "$WORK_DIR/configs/fs_config-$f"
@@ -35,7 +34,7 @@ COPY_SOURCE_FIRMWARE()
 
     if [ -d "$FW_DIR/$SOURCE_FIRMWARE_PATH/system_ext" ]; then
         if $TARGET_OS_BUILD_SYSTEM_EXT_PARTITION; then
-            LOG_STEP_IN "- Copying /system_ext from source firmware"
+            LOG_STEP_IN "- 소스 펌웨어에서 /system_ext 복사 중..."
 
             [ -L "$WORK_DIR/system/system_ext" ] && rm -f "$WORK_DIR/system/system_ext"
             [ -d "$WORK_DIR/system/system/system_ext" ] && rm -rf "$WORK_DIR/system/system/system_ext"
@@ -50,7 +49,7 @@ COPY_SOURCE_FIRMWARE()
 
             LOG_STEP_OUT
         else
-            LOG_STEP_IN "- Copying /system/system/system_ext from source firmware"
+            LOG_STEP_IN "- 소스 펌웨어에서 /system/system/system_ext 복사 중..."
 
             [ -d "$WORK_DIR/system/system_ext" ] && rm -rf "$WORK_DIR/system/system_ext"
             [ -L "$WORK_DIR/system/system/system_ext" ] && rm -f "$WORK_DIR/system/system/system_ext"
@@ -71,7 +70,7 @@ COPY_SOURCE_FIRMWARE()
         fi
     elif [ -d "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/system_ext" ]; then
         if $TARGET_OS_BUILD_SYSTEM_EXT_PARTITION; then
-            LOG_STEP_IN "- Copying /system_ext from source firmware"
+            LOG_STEP_IN "- 소스 펌웨어에서 /system_ext 복사 중..."
 
             [ -L "$WORK_DIR/system/system_ext" ] && rm -f "$WORK_DIR/system/system_ext"
             [ -d "$WORK_DIR/system/system/system_ext" ] && rm -rf "$WORK_DIR/system/system/system_ext"
@@ -90,7 +89,7 @@ COPY_SOURCE_FIRMWARE()
 
             LOG_STEP_OUT
         else
-            LOG_STEP_IN "- Copying /system/system/system_ext from source firmware"
+            LOG_STEP_IN "- 소스 펌웨어에서 /system/system/system_ext 복사 중..."
 
             [ -d "$WORK_DIR/system/system_ext" ] && rm -rf "$WORK_DIR/system/system_ext"
             [ -L "$WORK_DIR/system/system/system_ext" ] && rm -f "$WORK_DIR/system/system/system_ext"
@@ -108,12 +107,11 @@ COPY_SOURCE_FIRMWARE()
     fi
 }
 
-COPY_TARGET_FIRMWARE()
-{
+COPY_TARGET_FIRMWARE() {
     local TARGET_FOLDERS="odm odm_dlkm system_dlkm vendor vendor_dlkm"
     for f in $TARGET_FOLDERS; do
         if [ -d "$FW_DIR/$TARGET_FIRMWARE_PATH/$f" ]; then
-            LOG "- Copying /$f from target firmware"
+            LOG "- 타겟 펌웨어에서 /$f 복사 중..."
             EVAL "rsync -a --mkpath --delete \"$FW_DIR/$TARGET_FIRMWARE_PATH/$f\" \"$WORK_DIR\"" || exit 1
             EVAL "cp -a \"$FW_DIR/$TARGET_FIRMWARE_PATH/file_context-$f\" \"$WORK_DIR/configs/file_context-$f\"" || exit 1
             EVAL "cp -a \"$FW_DIR/$TARGET_FIRMWARE_PATH/fs_config-$f\" \"$WORK_DIR/configs/fs_config-$f\"" || exit 1
@@ -135,10 +133,9 @@ COPY_TARGET_FIRMWARE()
     done
 }
 
-COPY_TARGET_KERNEL()
-{
+COPY_TARGET_KERNEL() {
     if [ -d "$FW_DIR/$TARGET_FIRMWARE_PATH/kernel" ]; then
-        LOG_STEP_IN "- Copying target firmware kernel images"
+        LOG_STEP_IN "- 타겟 펌웨어 커널 이미지 복사 중..."
         EVAL "rsync -a --mkpath --delete \"$FW_DIR/$TARGET_FIRMWARE_PATH/kernel\" \"$WORK_DIR\"" || exit 1
         $TARGET_KEEP_ORIGINAL_SIGN || find "$WORK_DIR/kernel" -mindepth 1 -exec "$SRC_DIR/scripts/unsign_bin.sh" {} \;
         LOG_STEP_OUT

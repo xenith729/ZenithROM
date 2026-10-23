@@ -9,13 +9,13 @@ TARS=(
 )
 
 for i in "${TARS[@]}"; do
-    LOG "- Downloading $(basename "$i")"
+    LOG "- ???? ?: $(basename "$i")"
     DOWNLOAD_FILE "$REPOSITORY/$i" "$TMP_DIR/$(basename "$i")" || return 1
 done
 
 while IFS= read -r f; do
     FILE_NAME="$(basename "$f")"
-    LOG "- Verifying $FILE_NAME"
+    LOG "- ?? ?: $FILE_NAME"
 
     FILE_NAME="${FILE_NAME%.md5}"
 
@@ -34,12 +34,12 @@ while IFS= read -r f; do
     CALCULATED_HASH="$(head -c-$LENGTH "$f" | md5sum | cut -d " " -f 1 -s)"
 
     if [[ "$STORED_HASH" != "$CALCULATED_HASH" ]]; then
-        LOG "\033[0;31m! File is damaged\033[0m"
+        LOG "\033[0;31m! 파일이 손상되었습니다\033[0m"
         return 1
     fi
 
     FILE_NAME="$(basename "$f")"
-    LOG "- Extracting $FILE_NAME"
+    LOG "- ?? ?: $FILE_NAME"
 
     MODEL="$(cut -c4-8 <<< "$FILE_NAME" | sed "s/^/SM-/")"
 
@@ -51,7 +51,7 @@ while IFS= read -r f; do
     EVAL "rm -f \"$f\"" || return 1
 
     if [ -f "$TMP_DIR/firmware/$MODEL/modem_debug.bin.lz4" ]; then
-        LOG "- Deleting firmware/$MODEL/modem_debug.bin.lz4"
+        LOG "- ?? ?: firmware/$MODEL/modem_debug.bin.lz4"
         EVAL "rm -f \"$TMP_DIR/firmware/$MODEL/modem_debug.bin.lz4\"" || return 1
     fi
 
@@ -59,12 +59,12 @@ while IFS= read -r f; do
 done < <(find "$TMP_DIR" -type f -name "*.md5")
 
 while IFS= read -r f; do
-    LOG "- Decompressing ${f#"$TMP_DIR"/}"
+    LOG "- ?? ?? ?: ${f#"$TMP_DIR"/}"
     EVAL "lz4 -d --rm \"$f\" \"${f%.lz4}\"" || return 1
 done < <(find "$TMP_DIR" -type f -name "*.lz4")
 
 while IFS= read -r f; do
-    LOG "- Patching ${f#"$TMP_DIR"/}"
+    LOG "- ?? ?: ${f#"$TMP_DIR"/}"
     # https://android.googlesource.com/platform/system/core/+/refs/tags/android-15.0.0_r1/fastboot/fastboot.cpp#1129
     EVAL "printf \"\x03\" | dd of=\"$f\" bs=1 seek=123 count=1 conv=notrunc" || return 1
 done < <(find "$TMP_DIR" -type f -name "vbmeta.img")

@@ -21,18 +21,18 @@ while IFS= read -r f; do
         LABEL="u:object_r:vendor_npu_firmware_file:s0"
     fi
 
-    LOG "- Moving /vendor/firmware/$BLOB to /vendor/firmware/SM-G996B/$BLOB"
+    LOG "- ?? ?: /vendor/firmware/$BLOB to /vendor/firmware/SM-G996B/$BLOB"
     EVAL "mv \"$WORK_DIR/vendor/firmware/$BLOB\" \"$WORK_DIR/vendor/firmware/SM-G996B/$BLOB\""
     SET_METADATA "vendor" "firmware/SM-G996B/$BLOB" 0 0 644 "$LABEL"
 
-    LOG "- Creating dummy /vendor/firmware/$BLOB"
+    LOG "- ?? ?: dummy /vendor/firmware/$BLOB"
     EVAL "touch \"$WORK_DIR/vendor/firmware/$BLOB\""
 
     unset BLOB LABEL
 done < <(find "$MODPATH/vendor/firmware/SM-G996N" -type f)
 
 # SELinux
-LOG "- Adding SELinux entries"
+LOG "- ?? ?: SELinux entries"
 {
     echo "(allow init_30_0 tee_file (dir (mounton)))"
     echo "(allow priv_app_30_0 tee_file (dir (getattr)))"
