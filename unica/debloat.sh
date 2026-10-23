@@ -1,69 +1,10 @@
 # Copyright (c) 2025 Salvo Giangreco
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# UN1CA debloat list
-# - Add entries inside the specific partition containing that file (<PARTITION>_DEBLOAT+="")
-# - DO NOT add the partition name at the start of any entry (eg. "/system/dpolicy_system")
-# - DO NOT add a slash at the start of any entry (eg. "/dpolicy_system")
-
-# Samsung Defex policy
-SYSTEM_DEBLOAT+="
-dpolicy_system
-"
-VENDOR_DEBLOAT+="
-etc/dpolicy
-"
-
-# Samsung PROCA certificate DB
-SYSTEM_DEBLOAT+="
-system/etc/proca.db
-"
-
-# Samsung SIM Unlock
-SYSTEM_DEBLOAT+="
-system/bin/ssud
-system/etc/init/ssu_$(GET_PROP "system" "ro.product.system.name").rc
-system/etc/init/ssu.rc
-system/etc/permissions/privapp-permissions-com.samsung.ssu.xml
-system/etc/sysconfig/samsungsimunlock.xml
-system/lib64/android.security.securekeygeneration-ndk.so
-system/lib64/libssu_keystore2.so
-system/priv-app/SsuService
-"
-
-# Recovery restoration script
-VENDOR_DEBLOAT+="
-recovery-from-boot.p
-bin/install-recovery.sh
-etc/init/vendor_flash_recovery.rc
-"
-
-# PDP apps
-SYSTEM_DEBLOAT+="
-system/preload
-"
-
-truncate -s 0 "$WORK_DIR/system/system/etc/vpl_apks_count_list.txt"
-
-# eSIM
-[[ "$TARGET_COMMON_SUPPORT_EMBEDDED_SIM" == "false" ]] && SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
-system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.euicc.xml
-system/priv-app/EsimKeyString
-system/priv-app/EuiccService
-"
-
-# SmartFPSAdjuster
-[ "$TARGET_LCD_CONFIG_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
-system/priv-app/IntelligentDynamicFpsService
-"
-
-# Application recommendations
-SYSTEM_DEBLOAT+="
-system/app/MAPSAgent
-"
+# ZenithROM 블로트웨어 제거 목록
+# - 해당 파일이 포함된 파티션의 항목에 추가하세요. (<PARTITION>_DEBLOAT+="")
+# - 항목 앞에 파티션 이름을 추가하지 마세요. (예: "/system/dpolicy_system" 대신 "dpolicy_system")
+# - 항목 앞에 슬래시(/)를 추가하지 마세요. (예: "/dpolicy_system" 대신 "dpolicy_system")
 
 # AppUpdateCenter
 SYSTEM_DEBLOAT+="
@@ -77,50 +18,40 @@ system/etc/permissions/privapp-permissions-com.sec.bcservice.xml
 system/priv-app/BCService
 "
 
+# CallLogBackup
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.calllogbackup.xml
+system/priv-app/CallLogBackup
+"
+
+# ccinfo
+SYSTEM_DEBLOAT+="
+system/app/ccinfo
+"
+
+# ChromeCustomizations
+SYSTEM_DEBLOAT+="
+system/app/ChromeCustomizations
+"
+
+# EnhancedAttestationAgent
+SYSTEM_DEBLOAT+="
+system/priv-app/EnhancedAttestationAgent
+"
+
+# Fast
+SYSTEM_DEBLOAT+="
+system/app/Fast
+"
+
 # Gaming Hub
 SYSTEM_DEBLOAT+="
 system/etc/permissions/privapp-permissions-com.samsung.android.game.gamehome.xml
 system/priv-app/GameHome
 "
-
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/etc/permissions/signature-permissions-com.samsung.android.game.gamehome.xml" \
     0 0 644 "u:object_r:system_file:s0"
-
-# Gemini shortcut
-PRODUCT_DEBLOAT+="
-app/BardShell
-"
-
-# Gmail
-PRODUCT_DEBLOAT+="
-app/Gmail2
-"
-
-# Google Assistant shortcut
-PRODUCT_DEBLOAT+="
-app/AssistantShell
-"
-
-# Google Chrome
-PRODUCT_DEBLOAT+="
-app/Chrome
-"
-
-# Google Duo
-PRODUCT_DEBLOAT+="
-app/DuoStub
-"
-
-# Google Maps
-PRODUCT_DEBLOAT+="
-app/Maps
-"
-
-# Google PAI (Play Autoinstall)
-SYSTEM_DEBLOAT+="
-system/app/PlayAutoInstallConfig
-"
 
 # HwModuleTest
 SYSTEM_DEBLOAT+="
@@ -129,44 +60,14 @@ system/app/FactoryAirCommandManager
 system/app/FactoryCameraFB
 system/app/HMT
 system/app/WlanTest
-system/etc/default-permissions/default-permissions-com.sec.factory.cameralyzer.xml
+system/app/DRParser
+system/app/BluetoothAgent
 system/etc/permissions/privapp-permissions-com.samsung.android.providers.factory.xml
 system/etc/permissions/privapp-permissions-com.sec.facatfunction.xml
+system/etc/sysconfig/preinstalled-packages-com.sec.android.app.bluetoothagent.xml
 system/priv-app/FacAtFunction
 system/priv-app/FactoryTestProvider
-"
-
-# Language packs
-SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
-
-# LED Cover Service
-[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_CONFIG_NFC_LED_COVER_LEVEL")" -lt "30" ] && SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.sec.android.cover.ledcover.xml
-system/priv-app/LedCoverService
-"
-
-# Link to Windows
-# Replace full apk with stub apk to save space
-SYSTEM_DEBLOAT+="
-system/priv-app/YourPhone_P1_5
-"
-
-ADD_TO_WORK_DIR "gta9pxxx" "system" "system/priv-app/YourPhone_Stub/YourPhone_Stub.apk" 0 0 644 "u:object_r:system_file:s0"
-
-# Live Transcribe
-SYSTEM_DEBLOAT+="
-system/app/LiveTranscribe
-system/etc/sysconfig/feature-a11y-preload.xml
-"
-
-# Meta
-SYSTEM_DEBLOAT+="
-system/app/FBAppManager_NS
-system/etc/default-permissions/default-permissions-meta.xml
-system/etc/permissions/privapp-permissions-meta.xml
-system/etc/sysconfig/meta-hiddenapi-package-allowlist.xml
-system/priv-app/FBInstaller_NS
-system/priv-app/FBServices
+system/priv-app/SEMFactoryApp
 "
 
 # Microsoft OneDrive
@@ -182,75 +83,10 @@ system/etc/sysconfig/preinstalled-packages-com.mygalaxy.service.xml
 system/priv-app/MyGalaxyService
 "
 
-# Samsung Analytics
-SYSTEM_DEBLOAT+="
-system/app/DsmsAPK
-system/etc/permissions/privapp-permissions-com.samsung.android.dqagent.xml
-system/etc/permissions/privapp-permissions-com.sec.android.diagmonagent.xml
-system/etc/permissions/privapp-permissions-com.sec.android.soagent.xml
-system/priv-app/DeviceQualityAgent36
-system/priv-app/DiagMonAgent95
-system/priv-app/SOAgent76
-"
-
-SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CONTEXTSERVICE_ENABLE_SURVEY_MODE" --delete
-
-# Samsung AR Emoji
-SYSTEM_DEBLOAT+="
-system/etc/default-permissions/default-permissions-com.sec.android.mimage.avatarstickers.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.aremojieditor.xml
-system/etc/permissions/privapp-permissions-com.sec.android.mimage.avatarstickers.xml
-system/etc/permissions/signature-permissions-com.sec.android.mimage.avatarstickers.xml
-system/priv-app/AREmojiEditor
-system/priv-app/AvatarEmojiSticker
-"
-
-# Samsung Calendar
-SYSTEM_DEBLOAT+="
-system/app/SamsungCalendar
-"
-
-# Samsung Clock
-SYSTEM_DEBLOAT+="
-system/app/ClockPackage
-"
-
-# Samsung Free
-SYSTEM_DEBLOAT+="
-system/app/MinusOnePage
-"
-
 # Samsung Language Core
 SYSTEM_DEBLOAT+="
 system/etc/permissions/signature-permissions-com.samsung.android.offline.languagemodel.xml
 system/priv-app/OfflineLanguageModel_stub
-"
-
-# Samsung Messages
-SYSTEM_DEBLOAT+="
-system/etc/default-permissions/default-permissions-com.samsung.android.messaging.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.messaging.xml
-system/priv-app/SamsungMessages
-"
-
-# Samsung Pass
-SYSTEM_DEBLOAT+="
-system/app/SamsungPassAutofill_v1
-system/etc/init/samsung_pass_authenticator_service.rc
-system/etc/permissions/authfw.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.authfw.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.samsungpass.xml
-system/etc/permissions/signature-permissions-com.samsung.android.samsungpass.xml
-system/etc/permissions/signature-permissions-com.samsung.android.samsungpassautofill.xml
-system/etc/sysconfig/samsungauthframework.xml
-system/etc/sysconfig/samsungpassapp.xml
-system/priv-app/AuthFramework
-system/priv-app/SamsungPass
-"
-
-# Samsung Reminder
-SYSTEM_DEBLOAT+="
-system/app/SmartReminder
 "
 
 # Samsung Visit In
@@ -260,7 +96,226 @@ system/etc/permissions/privapp-permissions-com.samsung.android.ipsgeofence.xml
 system/priv-app/IpsGeofence
 "
 
-# Samsung Wallet
+# SamsungPositioning
+SYSTEM_DEBLOAT+="
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.samsungpositioning.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.samsungpositioning.xml
+system/priv-app/SamsungPositioning
+"
+
+# SettingsHelper
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.settingshelper.xml
+system/etc/sysconfig/settingshelper.xml
+system/priv-app/SHClient
+"
+
+# Smart Touch Call
+SYSTEM_DEBLOAT+="
+system/etc/default-permissions/default-permissions-com.samsung.android.visualars.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.visualars.xml
+system/priv-app/SmartTouchCall
+"
+
+# Smart Tutor
+SYSTEM_DEBLOAT+="
+system/hidden/SmartTutor
+"
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_SMARTTUTOR_PACKAGES_NAME" --delete
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_SMARTTUTOR_PACKAGES_PATH" --delete
+
+# SmartFPSAdjuster
+[ "$TARGET_LCD_CONFIG_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
+system/priv-app/IntelligentDynamicFpsService
+"
+
+# SVC Agent
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.svcagent.xml
+system/priv-app/SVCAgent
+"
+
+# SVoiceIME
+SYSTEM_DEBLOAT+="
+system/priv-app/SVoiceIME
+"
+# TalkBack
+SYSTEM_DEBLOAT+="
+system/app/TalkBack
+"
+
+# Bluetooth Midi 서비스
+SYSTEM_DEBLOAT+="
+system/app/BluetoothMidiService
+"
+
+# Google 앱
+PRODUCT_DEBLOAT+="
+app/AssistantShell
+app/BardShell
+app/Chrome
+app/DuoStub
+app/Gmail2
+app/Maps
+app/YouTube
+overlay/GmsConfigOverlaySearchSelector.apk
+priv-app/Messages
+priv-app/SearchSelector
+"
+
+SYSTEM_DEBLOAT+="
+system/app/LiveTranscribe
+system/app/PlayAutoInstallConfig
+system/app/VoiceAccess
+system/etc/sysconfig/feature-a11y-preload.xml
+system/etc/sysconfig/feature-a11y-preload-voacc.xml
+"
+
+# IMS 로깅
+SYSTEM_DEBLOAT+="
+system/etc/sysconfig/preinstalled-packages-com.sec.imslogger
+system/etc/permissions/privapp-permissions-com.sec.imslogger.xml
+system/priv-app/ImsLogger
+"
+
+# Silent 로깅
+SYSTEM_DEBLOAT+="
+system/app/SilentLog
+"
+
+# SIM 앱 다이얼로그
+SYSTEM_DEBLOAT+="
+system/app/SimAppDialog
+"
+
+# Wi-Fi 가이드
+SYSTEM_DEBLOAT+="
+system/app/WifiGuider
+"
+
+# Windows와 연결
+# 공간을 절약하기 위해 stub 앱으로 교체
+SYSTEM_DEBLOAT+="
+system/priv-app/YourPhone_P1_5
+"
+ADD_TO_WORK_DIR "gta9pxxx" "system" "system/priv-app/YourPhone_Stub/YourPhone_Stub.apk" 0 0 644 "u:object_r:system_file:s0"
+
+# 리마인더
+SYSTEM_DEBLOAT+="
+system/app/SmartReminder
+"
+
+# 메타 앱
+SYSTEM_DEBLOAT+="
+system/app/FBAppManager_NS
+system/etc/default-permissions/default-permissions-meta.xml
+system/etc/permissions/privapp-permissions-meta.xml
+system/etc/sysconfig/meta-hiddenapi-package-allowlist.xml
+system/priv-app/FBInstaller_NS
+system/priv-app/FBServices
+"
+
+# 보안 정책
+SYSTEM_DEBLOAT+="
+system/app/AASAservice
+"
+
+# 복구 모드 복원 스크립트
+VENDOR_DEBLOAT+="
+recovery-from-boot.p
+bin/install-recovery.sh
+etc/init/vendor_flash_recovery.rc
+"
+
+# 북마크 공급자
+SYSTEM_DEBLOAT+="
+system/app/BookmarkProvider
+system/app/PartnerBookmarksProvider
+"
+
+# 사전 로딩된 앱
+SYSTEM_DEBLOAT+="
+system/preload
+"
+truncate -s 0 "$WORK_DIR/system/system/etc/vpl_apks_count_list.txt"
+
+# eSIM
+[[ "$TARGET_COMMON_SUPPORT_EMBEDDED_SIM" == "false" ]] && SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
+system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.euicc.xml
+system/priv-app/EsimKeyString
+system/priv-app/EuiccService
+"
+
+# 삼성 AR 이모지
+SYSTEM_DEBLOAT+="
+system/etc/default-permissions/default-permissions-com.sec.android.mimage.avatarstickers.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.aremojieditor.xml
+system/etc/permissions/privapp-permissions-com.sec.android.mimage.avatarstickers.xml
+system/etc/permissions/signature-permissions-com.sec.android.mimage.avatarstickers.xml
+system/priv-app/AREmojiEditor
+system/priv-app/AvatarEmojiSticker
+"
+
+# 삼성 Defex 정책
+SYSTEM_DEBLOAT+="
+dpolicy_system
+"
+VENDOR_DEBLOAT+="
+etc/dpolicy
+"
+
+# 삼성 PROCA 인증 DB
+SYSTEM_DEBLOAT+="
+system/etc/proca.db
+"
+
+# 삼성 SIM 잠금 해제
+SYSTEM_DEBLOAT+="
+system/bin/ssud
+system/etc/init/ssu_$(GET_PROP "system" "ro.product.system.name").rc
+system/etc/init/ssu.rc
+system/etc/permissions/privapp-permissions-com.samsung.ssu.xml
+system/etc/sysconfig/samsungsimunlock.xml
+system/lib64/android.security.securekeygeneration-ndk.so
+system/lib64/libssu_keystore2.so
+system/priv-app/SsuService
+"
+
+# 삼성 녹스
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.skms.android.agent.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.bbc.bbcagent.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.mdm.xml
+system/priv-app/knoxanalyticsagent
+system/priv-app/SKMSAgent
+system/app/BBCAgent
+system/app/Rampart
+system/app/MDMApp
+system/app/UniversalMDMClient
+"
+
+# 삼성 뉴스
+SYSTEM_DEBLOAT+="
+system/app/MinusOnePage
+"
+
+# 삼성 데이터 분석
+SYSTEM_DEBLOAT+="
+system/app/DsmsAPK
+system/etc/permissions/privapp-permissions-com.samsung.android.dqagent.xml
+system/etc/permissions/privapp-permissions-com.sec.android.diagmonagent.xml
+system/etc/permissions/privapp-permissions-com.sec.android.soagent.xml
+system/etc/sysconfig/preinstalled-packages-com.sec.android.soagent.xml
+system/priv-app/DeviceQualityAgent36
+system/priv-app/DiagMonAgent95
+system/priv-app/SOAgent76
+"
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CONTEXTSERVICE_ENABLE_SURVEY_MODE" --delete
+
+# 삼성 월렛
 SYSTEM_DEBLOAT+="
 system/etc/init/digitalkey_init_ble_tss2.rc
 system/etc/permissions/org.carconnectivity.android.digitalkey.rangingintent.xml
@@ -282,57 +337,78 @@ framework/org.carconnectivity.android.digitalkey.rangingintent.jar
 framework/org.carconnectivity.android.digitalkey.secureelement.jar
 "
 
-# Search engine selector
-PRODUCT_DEBLOAT+="
-overlay/GmsConfigOverlaySearchSelector.apk
-priv-app/SearchSelector
-"
-
-# SettingsHelper
+# 삼성 키즈
 SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.samsung.android.settingshelper.xml
-system/etc/sysconfig/settingshelper.xml
-system/priv-app/SHClient
+system/app/KidsHome_Installer
 "
 
-# Smart Touch Call
+# 삼성 패스
 SYSTEM_DEBLOAT+="
-system/etc/default-permissions/default-permissions-com.samsung.android.visualars.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.visualars.xml
-system/priv-app/SmartTouchCall
+system/app/SamsungPassAutofill_v1
+system/etc/init/samsung_pass_authenticator_service.rc
+system/etc/permissions/authfw.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.authfw.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.samsungpass.xml
+system/etc/permissions/signature-permissions-com.samsung.android.samsungpass.xml
+system/etc/permissions/signature-permissions-com.samsung.android.samsungpassautofill.xml
+system/etc/sysconfig/samsungauthframework.xml
+system/etc/sysconfig/samsungpassapp.xml
+system/priv-app/AuthFramework
+system/priv-app/SamsungPass
 "
 
-# Smart Tutor
-SYSTEM_DEBLOAT+="
-system/hidden/SmartTutor
-"
-
-SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_SMARTTUTOR_PACKAGES_PATH" --delete
-
-# Software update
+# 소프트웨어 업데이트
 SYSTEM_DEBLOAT+="
 system/etc/permissions/privapp-permissions-com.wssyncmldm.xml
 system/priv-app/FotaAgent
 "
 
-# SVC Agent
+# 시계
 SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.samsung.android.svcagent.xml
-system/priv-app/SVCAgent
+system/app/ClockPackage
 "
 
-# SVoiceIME
+# 시스템 추적
 SYSTEM_DEBLOAT+="
-system/priv-app/SVoiceIME
+system/priv-app/Traceur
 "
 
-# Voice Access
+# 애플리케이션 추천
 SYSTEM_DEBLOAT+="
-system/app/VoiceAccess
-system/etc/sysconfig/feature-a11y-preload-voacc.xml
+system/app/MAPSAgent
 "
 
-# YouTube
-PRODUCT_DEBLOAT+="
-app/YouTube
+# 언어 팩
+SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
+
+# LED 커버 서비스
+[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_CONFIG_NFC_LED_COVER_LEVEL")" -lt "30" ] && SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.sec.android.cover.ledcover.xml
+system/priv-app/LedCoverService
+"
+
+# 연락처 위젯
+SYSTEM_DEBLOAT+="
+system/app/EasymodeContactsWidget81
+"
+
+# 자녀 보호
+SYSTEM_DEBLOAT+="
+system/app/ParentalCare
+"
+
+# 캐리어 앱
+SYSTEM_DEBLOAT+="
+system/app/CarrierDefaultApp
+system/etc/permissions/privapp-permissions-com.samsung.android.cidmanager.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.app.omcagent.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.cidmanager.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.omcagent.xml
+system/priv-app/CIDManager
+system/priv-app/OMCAgent5
+"
+
+# 캘린더
+SYSTEM_DEBLOAT+="
+system/app/SamsungCalendar
 "
