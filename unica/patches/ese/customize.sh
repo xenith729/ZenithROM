@@ -44,7 +44,6 @@ if [[ "$SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" == "NXP" ]] && [[ "$SOURCE_SECUR
         "system" "system/lib64/libtlc_blockchain_keystore.so" 0 0 644 "u:object_r:system_lib_file:s0"
     ADD_TO_WORK_DIR "$([[ "$TARGET_OS_SINGLE_SYSTEM_IMAGE" == "qssi" ]] && echo "a73xqxx" || echo "a54xnsxx")" \
         "system" "system/lib64/libtlc_payment_spay.so" 0 0 644 "u:object_r:system_lib_file:s0"
-    DELETE_FROM_WORK_DIR "system" "system/priv-app/SEMFactoryApp"
     DELETE_FROM_WORK_DIR "system" "system/priv-app/SamsungSeAgent"
     unset -f LOG_MISSING_PATCHES
     return 0
