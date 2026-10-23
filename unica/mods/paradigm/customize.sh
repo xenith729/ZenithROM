@@ -1,17 +1,8 @@
 # shellcheck disable=SC2034
 SKIPUNZIP=1
 
-if [ ! "$(GET_PROP "system" "ro.zenith.codename")" ]; then
-    LOG "- ?? ?: /system/system/etc/selinux/plat_property_contexts"
-    EVAL "echo \"ro.zenith.codename u:object_r:build_prop:s0 exact string\" >> \"$WORK_DIR/system/system/etc/selinux/plat_property_contexts\""
-    # Match latest Samsung's flagship device codename
-    ROM_CODENAME="$(basename "$MODPATH")"
-    SET_PROP "system" "ro.zenith.codename" "${ROM_CODENAME^}"
-    unset ROM_CODENAME
-fi
-
-# 2025 Audio Pack
-LOG_STEP_IN "- ?? ?: 2025 Audio Pack"
+# 2025 오디오 팩
+LOG_STEP_IN "- 2025 오디오 팩 추가 중..."
 DELETE_FROM_WORK_DIR "system" "system/hidden/INTERNAL_SDCARD/Music/Samsung/Over_the_Horizon.mp3"
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/hidden/INTERNAL_SDCARD/Music/Samsung/Over_the_Horizon.m4a" 0 0 644 "u:object_r:system_file:s0"
@@ -45,7 +36,7 @@ APPLY_PATCH "system" "system/priv-app/SecSoundPicker/SecSoundPicker.apk" \
 LOG_STEP_OUT
 
 # Adaptive colour tone
-LOG_STEP_IN "- ?? ?: Adaptive colour tone feature"
+LOG_STEP_IN "- 색상 최적화 기능 활성화 중..."
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/etc/permissions/privapp-permissions-com.samsung.android.sead.xml" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
@@ -75,12 +66,12 @@ APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
     "$MODPATH/ead/SystemUI.apk/0001-Add-Adaptive-color-tone-toggle.patch"
 LOG_STEP_OUT
 
-# Set AI Version to 20253 (latest)
+# AI 버전을 20253으로 설정 (최신)
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION" "20253"
 ADD_TO_WORK_DIR "pa2qxxx" "system" "system/app/SketchBook/SketchBook.apk" 0 0 644 "u:object_r:system_file:s0"
 
 # Media Context Analyzer
-LOG_STEP_IN "- ?? ?: Media Context Analyzer feature"
+LOG_STEP_IN "- Media Context Analyzer 기능 활성화 중..."
 ADD_TO_WORK_DIR "a56xnaxx" "system" "system/etc/mediacontextanalyzer/Detection.tflite" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "a56xnaxx" "system" "system/etc/mediacontextanalyzer/human-pet-det_SR-V131.tflite" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "a56xnaxx" "system" "system/etc/mediacontextanalyzer/human-pet-pose_SR-V200.tflite" 0 0 644 "u:object_r:system_file:s0"
@@ -95,9 +86,9 @@ SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_MMFW_CONFIG_MEDIA_CONTEXT_ANAL
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_MMFW_SUPPORT_MEDIA_CONTEXT_ANALYZER" "TRUE"
 LOG_STEP_OUT
 
-# Audio eraser
-# Requires SEC_PRODUCT_FEATURE_MMFW_SUPPORT_MEDIA_CONTEXT_ANALYZER
-LOG_STEP_IN "- ?? ?: Audio eraser feature"
+# 오디오 지우개
+# SEC_PRODUCT_FEATURE_MMFW_SUPPORT_MEDIA_CONTEXT_ANALYZER를 요구합니다.
+LOG_STEP_IN "- 오디오 지우개 기능 활성화 중..."
 ADD_TO_WORK_DIR "pa2qxxx" "system" "system/etc/audio_ae_intervals.conf" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa2qxxx" "system" "system/etc/fastScanner.tflite" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa2qxxx" "system" "system/etc/mss_v0.13.0_4ch.sorione" 0 0 644 "u:object_r:system_file:s0"
@@ -113,9 +104,9 @@ SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_AUDIO_CONFIG_MULTISOURCE_SEPAR
 LOG_STEP_OUT
 
 # Now brief
-# Requires SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION >= 20251
-# or SEC_FLOATING_FEATURE_FRAMEWORK_SUPPORT_AI_BRIEF_FOR_UT
-LOG_STEP_IN "- ?? ?: Now brief feature"
+# SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION >= 20251를 요구합니다.
+# 또는 SEC_FLOATING_FEATURE_FRAMEWORK_SUPPORT_AI_BRIEF_FOR_UT
+LOG_STEP_IN "- Now brief 기능 활성화 중..."
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/etc/default-permissions/default-permissions-com.samsung.android.app.moments.xml" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
@@ -126,21 +117,20 @@ ADD_TO_WORK_DIR "pa2qxxx" "system" "system/priv-app/Moments/Moments.apk" 0 0 644
 ADD_TO_WORK_DIR "$MODPATH" "system" \
     "system/priv-app/SamsungSmartSuggestions/SamsungSmartSuggestions.apk" 0 0 644 "u:object_r:system_file:s0"
 # HACK [
-# Samsung has released an update for the Smart suggestions app in March 2026.
-# The versioning of the "basic-global-release" flavor differs from the "full-global-release" one.
-# This is done on purpose: Samsung uses a lower version number to avoid installing this variant
-# on unsupported devices by triggering the downgrade check in PM. To avoid users updating to the
-# "non-AI" app, let's fake the versionCode so that it matches the latest available version.
+# 삼성은 2026년 3월 Smart Suggestions 앱 업데이트를 출시했습니다.
+# "basic-global-release" 유형 앱의 버전 체계는 "full-global-release"와 다릅니다.
+# 이는 의도된 것입니다. 삼성은 패키지 관리자의 다운그레이드 검사를 유도하여 지원되지 않는 기기에 이 변형 버전이 설치되는 것을 막기 위해 더 낮은 버전 번호를 사용합니다.
+# 사용자가 AI 미 지원 앱으로 업데이트하는 것을 방지하기 위해, versionCode를 조작하여 사용 가능한 최신 버전과 일치시킵니다.
 DECODE_APK "system" "system/priv-app/SamsungSmartSuggestions/SamsungSmartSuggestions.apk"
-LOG "- ?? ?: versionCode in SamsungSmartSuggestions.apk"
+LOG "- SamsungSmartSuggestions.apk에서 versionCode 패치 중..."
 EVAL "sed -i \"s/710500000/711100100/g\" \"$APKTOOL_DIR/system/priv-app/SamsungSmartSuggestions/SamsungSmartSuggestions.apk/apktool.yml\""
 # ]
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_SUPPORT_PERSONALIZED_DATA_CORE" "TRUE"
 LOG_STEP_OUT
 
 # Semantic search
-# Requires SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION >= 20251
-LOG_STEP_IN "- ?? ?: Semantic search feature"
+# SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION >= 20251를 요구합니다.
+LOG_STEP_IN "- Semantic search 기능 활성화 중..."
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/etc/default-permissions/default-permissions-com.samsung.mediasearch.xml" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
@@ -160,7 +150,7 @@ ADD_TO_WORK_DIR "pa2qxxx" "system" \
 ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/priv-app/SemanticSearchCore/SemanticSearchCore.apk" 0 0 644 "u:object_r:system_file:s0"
 DECODE_APK "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
-LOG "- ??? ?: Semantic search feature in /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
+LOG "- /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk에서 Semantic search 기능 활성화 중..."
 EVAL "cp -a \"$MODPATH/semanticsearch/SecSettingsIntelligence.apk/res/raw/\"* \"$APKTOOL_DIR/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk/res/raw\""
 SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk" \
     "smali_classes2/com/samsung/android/settings/intelligence/Rune.smali" "replaceall" \
@@ -170,13 +160,13 @@ SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelli
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_MSCH_SUPPORT_NLSEARCH" "TRUE"
 LOG_STEP_OUT
 
-# Game Booster
-LOG "- ???? ?: latest Game Booster app"
+# 게임 부스터
+LOG "- 최신 게임 부스터 앱 다운로드 중..."
 DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "com.samsung.android.game.gametools")" \
     "$WORK_DIR/system/system/priv-app/GameTools_Dream/GameTools_Dream.apk"
 
-# Pet Detector in Galaxy AI
-LOG_STEP_IN "- ?? ?: Pet Detector support in Galaxy AI features"
+# Galaxy AI - Pet Detector
+LOG_STEP_IN "- Galaxy AI 기능에서 Pet Detector 지원 활성화 중..."
 if [ -d "$WORK_DIR/vendor/etc/petdetector/studio_pd" ]; then
     DELETE_FROM_WORK_DIR "vendor" "etc/petdetector/studio_pd"
 fi
