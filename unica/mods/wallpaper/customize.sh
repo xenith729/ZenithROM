@@ -1,11 +1,10 @@
 if $DEBUG; then
-    LOG "\033[0;33m! Debug build detected. Skipping\033[0m"
+    LOG "\033[0;33m! 디버그 빌드가 감지되었습니다. 건너 뜁니다\033[0m"
     return 0
 fi
 
 # [
-COMPRESS_WEBP()
-{
+COMPRESS_WEBP() {
     local FILE="$1"
     local FILE_PATH
     local FILE_NAME
@@ -36,8 +35,7 @@ COMPRESS_WEBP()
     EVAL "mv -f \"$FILE_PATH/temp.webp\" \"$FILE_PATH/$FILE_NAME\"" || return 1
 }
 
-ENCODE_MP4()
-{
+ENCODE_MP4() {
     local FILE="$1"
     local FILE_PATH
     local FILE_NAME
@@ -80,7 +78,7 @@ done
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/raw/video_"*.mp4; do
     ENCODE_MP4 "$f"
 done
-LOG "- ???? ?: latest Samsung Wallpaper app"
+LOG "- 최신 삼성 배경화면 앱 다운로드 중..."
 DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "000008552712")" \
     "$WORK_DIR/system/system/priv-app/SpriteWallpaper/SpriteWallpaper.apk"
 APPLY_PATCH "system" "system/priv-app/SpriteWallpaper/SpriteWallpaper.apk" \

@@ -4,7 +4,7 @@ PUB_KEY_ADDR_EXTRACT() {
 
     local HEADER="256" AUTH_SZ="12" PK_OFF="64" PK_SIZE="72"
 
-    # read 8-byte big-endian integer at offset
+    # 오프셋 위치에서 8바이트 빅엔디언 정수를 읽음
     READ_BE64() {
         local OFF="$1"
         local HEX

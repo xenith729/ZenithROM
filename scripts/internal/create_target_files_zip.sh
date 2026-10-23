@@ -72,8 +72,6 @@ GENERATE_BUILD_INFO() {
         echo "name=$TARGET_NAME"
         echo -n "version="
         [ "$(GET_PROP "system" "ro.zenith.version")" ] && GET_PROP "system" "ro.zenith.version" || echo "$ROM_VERSION"
-        echo -n "timestamp="
-        [ "$(GET_PROP "system" "ro.zenith.timestamp")" ] && GET_PROP "system" "ro.zenith.timestamp" || echo "$ROM_BUILD_TIMESTAMP"
         echo "os_version=$(GET_PROP "system" "ro.build.version.release")"
         echo "oneui_version=$(GET_PROP "system" "ro.build.version.oneui")"
         echo "build_incremental=$(GET_PROP "system" "ro.build.version.incremental")"

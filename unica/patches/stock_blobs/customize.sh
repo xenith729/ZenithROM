@@ -1,6 +1,5 @@
 # [
-MATCH_TARGET_AUDIO_FX_LIB()
-{
+MATCH_TARGET_AUDIO_FX_LIB() {
     local WRAPPER="$1"
     local PATTERN="$2"
     local SOURCE_LIB
@@ -26,8 +25,7 @@ MATCH_TARGET_AUDIO_FX_LIB()
     done
 }
 
-MATCH_TARGET_FEATURES()
-{
+MATCH_TARGET_FEATURES() {
     local SOURCE_FEATURES
     local TARGET_FEATURES
 
@@ -103,7 +101,7 @@ ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/media/shutdown.qmg" 0 0 644 
 if [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/priv-app/SohService/SohService.apk" ]; then
     DECODE_APK "system" "system/priv-app/SohService/SohService.apk"
 
-    LOG "- Adding target BSOH blobs"
+    LOG "- 타겟 BSOH 블롭 추가 중..."
     EVAL "rm -r \"$APKTOOL_DIR/system/priv-app/SohService/SohService.apk/assets\""
     EVAL "unzip -q \"$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/priv-app/SohService/SohService.apk\" \"assets/*\" -d \"$APKTOOL_DIR/system/priv-app/SohService/SohService.apk\""
 else

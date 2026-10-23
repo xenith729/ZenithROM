@@ -2,15 +2,14 @@
 SKIPUNZIP=1
 
 # [
-BACKPORT_SF_PROPS()
-{
+BACKPORT_SF_PROPS() {
     local FILE="$WORK_DIR/vendor/build.prop"
     if [ -f "$WORK_DIR/vendor/default.prop" ]; then
         FILE="$WORK_DIR/vendor/default.prop"
     fi
 
     if [ ! -f "$FILE" ]; then
-        ABORT "File not found: ${FILE//$SRC_DIR\//}"
+        ABORT "파일이 존재하지 않습니다: ${FILE//$SRC_DIR\//}"
     fi
 
     local PROP
@@ -23,7 +22,7 @@ BACKPORT_SF_PROPS()
         VALUE="$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "true" || echo "false")"
 
         if [ ! "$(GET_PROP "vendor" "$PROP")" ]; then
-            LOG "- Adding \"$PROP\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
+            LOG "${FILE//$WORK_DIR/}에 \"$PROP\" 프롭을 \"$VALUE\" 값으로 추가 중..."
             EVAL "sed -i \"/persist.sys.usb.config/i $PROP=$VALUE\" \"$FILE\""
         fi
     fi
@@ -48,7 +47,7 @@ BACKPORT_SF_PROPS()
 
         if [[ "$(sed -n "/$PROP/{x;p;d;}; x" "$FILE")" != *"use_content_detection_for_refresh_rate"* ]]; then
             if [ ! "$(GET_PROP "vendor" "ro.surface_flinger.use_content_detection_for_refresh_rate")" ]; then
-                LOG "- Adding \"ro.surface_flinger.use_content_detection_for_refresh_rate\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
+                LOG "${FILE//$WORK_DIR/}에 \"ro.surface_flinger.use_content_detection_for_refresh_rate\" 프롭을 \"$VALUE\" 값으로 추가 중..."
             else
                 EVAL "sed -i \"/use_content_detection_for_refresh_rate/d\" \"$FILE\""
             fi
@@ -58,14 +57,14 @@ BACKPORT_SF_PROPS()
         PROP="debug.sf.show_refresh_rate_overlay_render_rate"
         VALUE="true"
         if [ ! "$(GET_PROP "vendor" "$PROP")" ]; then
-            LOG "- Adding \"$PROP\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
+            LOG "${FILE//$WORK_DIR/}에 \"$PROP\" 프롭을 \"$VALUE\" 값으로 추가 중..."
             EVAL "sed -i \"/ro.surface_flinger.use_content_detection_for_refresh_rate/i $PROP=$VALUE\" \"$FILE\""
         fi
 
         PROP="ro.surface_flinger.game_default_frame_rate_override"
         VALUE="60"
         if [ ! "$(GET_PROP "vendor" "$PROP")" ]; then
-            LOG "- Adding \"$PROP\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
+            LOG "${FILE//$WORK_DIR/}에 \"$PROP\" 프롭을 \"$VALUE\" 값으로 추가 중..."
             EVAL "sed -i \"/debug.sf.show_refresh_rate_overlay_render_rate/a $PROP=$VALUE\" \"$FILE\""
         fi
     fi
@@ -110,22 +109,22 @@ EXTRACT_KERNEL_MODULES() {
 
 PATCHED=false
 
-# Pre-API 34
-# - Add ro.surface_flinger.enable_frame_rate_override if missing
+# API 34 미만
+# - 누락된 경우 ro.surface_flinger.enable_frame_rate_override 추가
 #
-# Pre-API 35
-# - Place ro.surface_flinger.use_content_detection_for_refresh_rate correctly
-# - Add debug.sf.show_refresh_rate_overlay_render_rate if missing
-# - Add ro.surface_flinger.game_default_frame_rate_override if missing
+# API 35 미만
+# - ro.surface_flinger.use_content_detection_for_refresh_rate를 올바른 위치에 배치
+# - 누락된 경우 debug.sf.show_refresh_rate_overlay_render_rate 추가
+# - 누락된 경우 ro.surface_flinger.game_default_frame_rate_override 추가
 BACKPORT_SF_PROPS
 
-# Pre-API 34
-# - Revert commit b0551be: "Camera: Remove GPS_LOCATION if set is called with null"
+# API 34 미만
+# - b0551be 커밋 되돌리기: "null로 설정된 경우 GPS_LOCATION 제거"
 #   (https://android.googlesource.com/platform/frameworks/base/+/b0551beb8dab6e399179fcc6525407237fc8ee56%5E%21/#F0)
-# - Support legacy Scene detection camera feature
+# - 구형 장면 감지 카메라 기능 지원
 #
-# Pre-API 35
-# - Add back SECOND_PICTURE_CONFIG camera feature support
+# API 35 미만
+# - SECOND_PICTURE_CONFIG 카메라 기능 지원 복원
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     PATCHED=true
     APPLY_PATCH "system" "system/framework/framework.jar" \
@@ -149,7 +148,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Support legacy Face HAL (pre-API 34)
+# 구형 Face HAL 지원 (pre-API 34)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     if [ ! -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.biometrics.face@3.0-service" ]; then
         PATCHED=true
@@ -167,9 +166,9 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
             > /dev/null
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl\$\$ExternalSyntheticLambda6.smali" "remove"
-        LOG "- Removing \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali\" from /system/system/framework/services.jar"
+        LOG "- /system/system/framework/services.jar에서 \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali\" 제거 중..."
         EVAL "rm \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali\""
-        LOG "- Removing \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Proxy.smali\" from /system/system/framework/services.jar"
+        LOG "- /system/system/framework/services.jar에서 \"smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Proxy.smali\" 제거 중..."
         EVAL "rm \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\\\$Proxy.smali\""
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Stub\$1.smali" "remove"
@@ -180,8 +179,8 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     fi
 fi
 
-# Support legacy SehLights HAL (pre-API 35)
-# - Check for [lsr wD, wS, #0x18] to determine if the newer HAL is already in place
+# 구형 SehLights HAL 지원 (pre-API 35)
+# - [lsr wD, wS, #0x18] 명령어가 있는지 확인하여, 더 최신 버전의 HAL이 이미 적용되어 있는지 확인
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" ] && \
             ! xxd -p -c 4 "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" | grep -q "1853$"; then
@@ -191,7 +190,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Ensure config_num_physical_slots is configured (pre-API 36)
+# config_num_physical_slots가 설정되어 있는지 확인 (pre-API 36)
 # https://android.googlesource.com/platform/frameworks/opt/telephony/+/42e37234cee15c9f3fcfac0532110abfc8843b99%5E%21/#F0
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     if [ ! "$(GET_PROP "ro.telephony.sim_slots.count")" ] && \
@@ -203,9 +202,9 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     fi
 fi
 
-# Support legacy sdFAT kernel drivers (pre-API 35)
+# 구형 sdFAT 커널 드라이버 지원 (pre-API 35)
 # https://android.googlesource.com/platform/system/vold/+/refs/tags/android-16.0.0_r2/fs/Vfat.cpp#150
-# - Check for 'bogus directory:' to determine if newer sdFAT drivers are in place
+# - 'bogus directory:' 항목을 확인하여 더 최신 버전의 sdFAT 드라이버가 적용되어 있는지 확인
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     EXTRACT_KERNEL_IMAGE
     if grep -q "SDFAT" "$TMP_DIR/out/kernel" && \
@@ -216,7 +215,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Ensure IMAGE_CODEC_SAMSUNG support (pre-API 35)
+# IMAGE_CODEC_SAMSUNG 지원 확인 (pre-API 35)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" ] && \
             [[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" != *"image_codec.samsung"* ]]; then
@@ -226,8 +225,8 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Ensure Knox Matrix support
-# - Check if target firmware runs on One UI 5.1.1 or above
+# Knox Matrix 지원 확인
+# - 타겟 펌웨어가 One UI 5.1.1 이상에서 실행되는지 확인
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 if [ "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.build.version.oneui")" -lt "50101" ]; then
     PATCHED=true
@@ -243,9 +242,9 @@ if [ "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.bu
     DELETE_FROM_WORK_DIR "system" "system/priv-app/KmxService"
 fi
 
-# Ensure Heatmap support
-# - GKI: check for samsung,sec_auth_sle956681/samsung,sec_auth_ds28e30 kernel drivers
-# - Non-GKI: unsupported
+# Heatmap 지원 확인
+# - GKI: samsung,sec_auth_sle956681/samsung,sec_auth_ds28e30 커널 드라이버 확인
+# - Non-GKI: 지원되지 않음
 if [ -f "$WORK_DIR/kernel/vendor_boot.img" ]; then
     EXTRACT_KERNEL_MODULES
     if ! grep -q "samsung,sec_auth" "$TMP_DIR/out/vendor_ramdisk"*; then
@@ -263,7 +262,7 @@ else
     DELETE_FROM_WORK_DIR "system" "system/lib64/libparam_A55_250328.so"
 fi
 
-# Support camera light sensor
+# 카메라 조도 센서 확인
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 if [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/priv-app/CameraLightSensor/CameraLightSensor.apk" ]; then
     PATCHED=true
@@ -285,10 +284,10 @@ if [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/priv-app/CameraLightSensor/
         "system/priv-app/CameraLightSensor/CameraLightSensor.apk" 0 0 644 "u:object_r:system_file:s0"
 fi
 
-# Ensure KSMBD support in kernel
-# - 4.19.x and below: unsupported
-# - 5.4.x-5.10.x: backport (https://github.com/namjaejeon/ksmbd.git)
-# - 5.15.x and above: supported
+# 커널에서 KSMBD 지원 확인
+# - 4.19.x 그리고 그 이하: 지원되지 않음
+# - 5.4.x-5.10.x: 백포트 (https://github.com/namjaejeon/ksmbd.git)
+# - 5.15.x 그리고 그 이상: 지원됨
 if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ]; then
     EXTRACT_KERNEL_IMAGE
     if ! grep -q "ksmbd" "$TMP_DIR/out/kernel"; then
@@ -307,9 +306,9 @@ if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ]; then
     fi
 fi
 
-# Ensure Sem eBPF Smart Hotspot functionality (pre-API 35)
-# - Check for TARGET_PLATFORM_SDK_VERSION < 35 as 4.14 kernel support has been deprecated in Android V
-# - Disable "ro.kernel.version" == "4.14" leftover checks, 4.14 needs eBPF kernel backports anyway
+# Sem eBPF 스마트 핫스팟 기능이 지원되는지 확인 (pre-API 35)
+# - Android 15에서는 4.14 커널 지원이 중단되었으므로 TARGET_PLATFORM_SDK_VERSION이 35 미만인지 확인
+# - "ro.kernel.version" == "4.14" 관련 잔여 검사 항목을 비활성화, 4.14 버전에서는 eBPF 커널 백포트 필요
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     EXTRACT_KERNEL_IMAGE
     if grep -q "Linux version 4.14" "$TMP_DIR/out/kernel"; then
@@ -322,8 +321,8 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Ensure IQtiComposer support (pre-API 36)
-# - Disable "ro.product.first_api_level" < 34 check
+# IQtiComposer 지원 확인 (pre-API 36)
+# - "ro.product.first_api_level" < 34 확인 비활성화
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     if [[ "$TARGET_OS_SINGLE_SYSTEM_IMAGE" == "qssi" ]] && \
             ! grep -q -r "IQtiComposer" "$WORK_DIR/vendor/etc/vintf"; then
@@ -333,8 +332,8 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     fi
 fi
 
-# Support schedtune cgroup controller (pre-API 36)
-# - Check for TARGET_PLATFORM_SDK_VERSION < 36 as 4.19 kernel support has been deprecated in Android B
+# schedtune cgroup 컨트롤러 지원 (pre-API 36)
+# - Android 16에서는 4.19 커널 지원이 더 이상 사용되지 않으므로 TARGET_PLATFORM_SDK_VERSION이 36 미만인지 확인
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     EXTRACT_KERNEL_IMAGE
     KERNEL_VERSION="$(grep -a -o -m 1 "Linux version [0-9]*\.[0-9]*" "$TMP_DIR/out/kernel" | awk '{print $3}')"
@@ -350,7 +349,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
         PATCHED=true
 
         if ! grep -q "# Create energy-aware scheduler tuning nodes" "$WORK_DIR/system/system/etc/init/hw/init.rc"; then
-            LOG "- Adding stune cgroup nodes to /system/system/etc/init/hw/init.rc"
+            LOG "- /system/system/etc/init/hw/init.rc에 stune cgroup nodes 추가 중..."
             EVAL "sed -i \"/mkdir \/dev\/socket\/ot-daemon 0770 thread_network thread_network/a\\\\
 \\\\
     # Create energy-aware scheduler tuning nodes\\\\
@@ -386,7 +385,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
         fi
 
         if ! grep -q "/dev/stune/audio-app" "$WORK_DIR/system/system/etc/init/hw/init.rc"; then
-            LOG "- Adding audio-app stune group to /system/system/etc/init/hw/init.rc"
+            LOG "- /system/system/etc/init/hw/init.rc에 audio-app stune group 추가 중..."
             EVAL "sed -i \"/chmod 0664 \/dev\/stune\/rt\/cgroup.procs/a\\\\
 \\\\
     mkdir /dev/stune/audio-app\\\\
@@ -396,7 +395,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
         fi
 
         if ! grep -q "/dev/stune/camera-daemon" "$WORK_DIR/system/system/etc/init/hw/init.rc"; then
-            LOG "- Adding camera-daemon stune group to /system/system/etc/init/hw/init.rc"
+            LOG "- /system/system/etc/init/hw/init.rc에 camera-daemon stune group 추가 중..."
             EVAL "sed -i \"/chmod 0664 \/dev\/cpuctl\/camera-daemon\/cpu.shares/a\\\\
 \\\\
     # Create an stune group for camera-specific processes\\\\
@@ -409,7 +408,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
         fi
 
         if ! grep -q "/dev/stune/nnapi-hal" "$WORK_DIR/system/system/etc/init/hw/init.rc"; then
-            LOG "- Adding nnapi-hal stune group to /system/system/etc/init/hw/init.rc"
+            LOG "- /system/system/etc/init/hw/init.rc에 nnapi-hal stune group 추가 중..."
             EVAL "sed -i \"/chmod 0664 \/dev\/stune\/camera-daemon\/cgroup.procs/a\\\\
 \\\\
     # Create an stune group for NNAPI HAL processes\\\\
@@ -440,7 +439,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     unset KERNEL_VERSION LEGACY_KERNEL
 fi
 
-# Ensure sbauth support in target firmware
+# 타겟 펌웨어에서 sbauth 지원 확인
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
         [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/bin/sbauth" ]; then
@@ -449,7 +448,7 @@ if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
     DELETE_FROM_WORK_DIR "system" "system/etc/init/sbauth.rc"
 fi
 
-# Ensure PASS support (pre-API 35)
+# PASS 지원 확인 (pre-API 35)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_file_contexts"; then
         PATCHED=true
@@ -459,10 +458,10 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Support OMX hardware video codecs (pre-API 35)
-# - Replace COLOR_FormatYUV420Flexible with COLOR_FormatSurface/OMX_COLOR_FormatAndroidOpaque
+# OMX 하드웨어 비디오 코덱 지원 (pre-API 35)
+# - COLOR_FormatYUV420Flexible을 COLOR_FormatSurface/OMX_COLOR_FormatAndroidOpaque로 교체w
 #   (https://android.googlesource.com/platform/frameworks/av/+/android-16.0.0_r2/media/libstagefright/omx/OMXNodeInstance.cpp#1687)
-# - Disable ACodec HEVC limitation for RECORDING_MODE_HDR10_PLUS/RECORDING_MODE_PRO_HDR10_PLUS
+# - RECORDING_MODE_HDR10_PLUS/RECORDING_MODE_PRO_HDR10_PLUS에 대한 ACodec HEVC 제한 비활성화
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if ! find "$WORK_DIR/vendor/etc" -maxdepth 1 -type f -name "media_codecs*.xml" ! -name "*performance*" -exec cat {} + | \
             grep -q -P -z '<MediaCodec\s[^>]*name="c2\.(?!android\.|sec\.)[^"]*"(?:(?!</?MediaCodec[\s>])[\s\S])*?="video/'; then
@@ -484,7 +483,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
             HEX_PATCH "$WORK_DIR/system/system/lib/libstagefright.so" \
                 "aaea002879d1264c0620" "aaea002879e0264c0620"
         else
-            ABORT "No known patch available for the supplied libstagefright.so"
+            ABORT "제공된 libstagefright.so에 대해 적용 가능한 패치가 존재하지 않습니다."
         fi
         if xxd -p -c 0 "$WORK_DIR/system/system/lib64/libstagefright.so" | grep -q "70690594205100347a9a40f9"; then
             HEX_PATCH "$WORK_DIR/system/system/lib64/libstagefright.so" \
@@ -493,7 +492,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
             HEX_PATCH "$WORK_DIR/system/system/lib64/libstagefright.so" \
                 "864d0594604d00347a9a40f9" "864d05941f2003d57a9a40f9"
         else
-            ABORT "No known patch available for the supplied libstagefright.so"
+            ABORT "제공된 libstagefright.so에 대해 적용 가능한 패치가 존재하지 않습니다."
         fi
         if [ -f "$WORK_DIR/system/system/priv-app/GlobalPostProcMgr/GlobalPostProcMgr.apk" ]; then
             SMALI_PATCH "system" "system/priv-app/GlobalPostProcMgr/GlobalPostProcMgr.apk" \
@@ -515,21 +514,21 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     fi
 fi
 
-# Ensure EU eco recharge support (pre-API 34)
-# - Check for 'batt_soc_rechg' to determine if newer battery drivers are in place
+# EU eco recharge 지원 확인 (pre-API 34)
+# - 'batt_soc_rechg' 항목을 확인하여 더 최신 버전의 배터리 드라이버가 적용되어 있는지 확인
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     VBOOT_MISSING=true
     KERNEL_MISSING=true
 
     if [ -f "$WORK_DIR/kernel/vendor_boot.img" ]; then
-        # Check for GKI devices
+        # GKI 디바이스 확인
         EXTRACT_KERNEL_MODULES
         if grep -q "batt_soc_rechg" "$TMP_DIR/out/vendor_ramdisk"*; then
             VBOOT_MISSING=false
         fi
     fi
 
-    # Check for legacy devices
+    # 구형 디바이스 확인
     EXTRACT_KERNEL_IMAGE
     if grep -q "batt_soc_rechg" "$TMP_DIR/out/kernel"; then
         KERNEL_MISSING=false
@@ -548,22 +547,22 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     unset VBOOT_MISSING KERNEL_MISSING
 fi
 
-# Support legacy usb_notify kernel drivers (pre-API 36)
+# 구형 usb_notify 커널 드라이버 지원 (pre-API 36)
 # https://github.com/salvogiangri/UN1CA/discussions/519
-# - Check for 'SKY_DEFAULT' to determine if newer usb_notify drivers are in place
+# - 'SKY_DEFAULT' 항목을 확인하여 더 최신 버전의 usb_notify 드라이버가 설치되어 있는지 확인
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     VBOOT_MISSING=true
     KERNEL_MISSING=true
 
     if [ -f "$WORK_DIR/kernel/vendor_boot.img" ]; then
-        # Check for GKI devices
+        # GKI 디바이스 확인
         EXTRACT_KERNEL_MODULES
         if grep -q "SKY_DEFAULT" "$TMP_DIR/out/vendor_ramdisk"*; then
             VBOOT_MISSING=false
         fi
     fi
 
-    # Check for legacy devices
+    # 구형 디바이스 확인
     EXTRACT_KERNEL_IMAGE
     if grep -q "SKY_DEFAULT" "$TMP_DIR/out/kernel"; then
         KERNEL_MISSING=false
@@ -611,8 +610,8 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     unset VBOOT_MISSING KERNEL_MISSING
 fi
 
-# Support legacy LED Cover level
-# - Replace deprecated 'android.nfc.NfcAdapter' APIs with 'com.samsung.android.nfc.adapter.ISamsungNfcAdapter'
+# 구형 LED 커버 레벨 지원
+# - 더 이상 사용되지 않는 'android.nfc.NfcAdapter' API를 'com.samsung.android.nfc.adapter.ISamsungNfcAdapter'로 교체
 if [ -f "$WORK_DIR/system/system/priv-app/LedCoverService/LedCoverService.apk" ]; then
     if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_CONFIG_NFC_LED_COVER_LEVEL")" -ge "30" ] && \
             [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_CONFIG_NFC_LED_COVER_LEVEL")" -lt "100" ]; then
@@ -622,7 +621,7 @@ if [ -f "$WORK_DIR/system/system/priv-app/LedCoverService/LedCoverService.apk" ]
     fi
 fi
 
-# Upgrade Segmentation models (pre-API 34)
+# Segmentation 모델 업그레이드 (pre-API 34)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     if grep -q "default_lowtier" "$WORK_DIR/system/system/cameradata/portrait_data/single_bokeh_feature.json" &&
             [ -f "$WORK_DIR/system/system/cameradata/portrait_data/SRIB_HumanInsSeg_FP16_V008.snf" ]; then
@@ -630,7 +629,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
         DELETE_FROM_WORK_DIR "system" "system/cameradata/portrait_data/SRIB_HumanInsSeg_FP16_V008.snf"
         ADD_TO_WORK_DIR "a17xxx" "system" \
             "system/cameradata/portrait_data/SRIB_BanetLite_FP16_V400.snf" 0 0 644 "u:object_r:system_file:s0"
-        LOG "- Patching /system/system/cameradata/portrait_data/single_bokeh_feature.json"
+        LOG "- /system/system/cameradata/portrait_data/single_bokeh_feature.json 패치 중..."
         EVAL "sed -i \"0,/HumanInsSeg_FP16_V008/s//BanetLite_FP16_V400/\" \"$WORK_DIR/system/system/cameradata/portrait_data/single_bokeh_feature.json\""
         EVAL "sed -i \"0,/008/s//400/\" \"$WORK_DIR/system/system/cameradata/portrait_data/single_bokeh_feature.json\""
         EVAL "sed -i \"0,/QASYMM8/s//FLOAT16/\" \"$WORK_DIR/system/system/cameradata/portrait_data/single_bokeh_feature.json\""
@@ -638,10 +637,10 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
 fi
 
 # Pre-API 35
-# - Upgrade MIDAS models
+# - MIDAS 모델 업그레이드
 #
 # Pre-API 36
-# - Update midas_config.json
+# - midas_config.json 업데이트
 if ! grep -q "\"version\": \"4\." "$WORK_DIR/vendor/etc/midas/midas_config.json"; then
     if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
         PATCHED=true
@@ -656,7 +655,7 @@ if ! grep -q "\"version\": \"4\." "$WORK_DIR/vendor/etc/midas/midas_config.json"
     fi
 fi
 
-# Upgrade Single Take models (pre-API 35)
+# 싱글테이크 모델 업데이트 (pre-API 35)
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ ! -d "$WORK_DIR/vendor/etc/singletake/ClarityScorer" ]; then
         PATCHED=true
@@ -672,7 +671,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
 fi
 
 if ! $PATCHED; then
-    LOG "\033[0;33m! Nothing to do\033[0m"
+    LOG "\033[0;33m! 아무 작업도 하지 않음\033[0m"
 fi
 
 if [ -d "$TMP_DIR" ]; then

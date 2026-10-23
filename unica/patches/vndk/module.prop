@@ -1,4 +1,4 @@
 id=vndk
 name=VNDK
 author=salvogiangri, Fede2782
-description=Checks the source device vendor API and replaces it if it's mismatched from target device.
+description=소스의 벤더 API를 확인하고 타겟의 것과 일치하지 않는 경우 교체합니다.

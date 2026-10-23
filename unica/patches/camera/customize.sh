@@ -1,14 +1,13 @@
 # [
 _LOG() { if $DEBUG; then LOGW "$1"; else ABORT "$1"; fi }
 
-LOG_MISSING_PATCHES()
-{
-    local MESSAGE="Missing SPF patches for condition ($1: [${!1}], $2: [${!2}])"
+LOG_MISSING_PATCHES() {
+    local MESSAGE="다음 유형에 대한 패치가 존재하지 않습니다: ($1: [${!1}], $2: [${!2}])"
 
     if $DEBUG; then
         LOGW "$MESSAGE"
     else
-        ABORT "${MESSAGE}. Aborting"
+        ABORT "${MESSAGE}. 중단합니다."
     fi
 }
 # ]
@@ -19,43 +18,43 @@ TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" 
 DELETE_FROM_WORK_DIR "system" "system/cameradata/portrait_data"
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/cameradata/portrait_data" 0 0 755 "u:object_r:system_file:s0"
 if [ -f "$SRC_DIR/target/$TARGET_CODENAME/camera/singletake/service-feature.xml" ]; then
-    LOG "- Adding /system/system/cameradata/singletake/service-feature.xml"
+    LOG "- /system/system/cameradata/singletake/service-feature.xml 추가 중..."
     EVAL "cp -a \"$SRC_DIR/target/$TARGET_CODENAME/camera/singletake/service-feature.xml\" \"$WORK_DIR/system/system/cameradata/singletake/service-feature.xml\""
 else
     ADD_TO_WORK_DIR "$TARGET_FIRMWARE" \
         "system" "system/cameradata/singletake/service-feature.xml" 0 0 644 "u:object_r:system_file:s0"
 fi
 if [ -f "$SRC_DIR/target/$TARGET_CODENAME/camera/aremoji-feature.xml" ]; then
-    LOG "- Adding /system/system/cameradata/aremoji-feature.xml"
+    LOG "- /system/system/cameradata/aremoji-feature.xml 추가 중..."
     EVAL "cp -a \"$SRC_DIR/target/$TARGET_CODENAME/camera/aremoji-feature.xml\" \"$WORK_DIR/system/system/cameradata/aremoji-feature.xml\""
 else
     ADD_TO_WORK_DIR "$TARGET_FIRMWARE" \
         "system" "system/cameradata/aremoji-feature.xml" 0 0 644 "u:object_r:system_file:s0"
 fi
 if [ -f "$SRC_DIR/target/$TARGET_CODENAME/camera/camera-feature.xml" ]; then
-    LOG "- Adding /system/system/cameradata/camera-feature.xml"
+    LOG "- /system/system/cameradata/camera-feature.xml 추가 중..."
     EVAL "cp -a \"$SRC_DIR/target/$TARGET_CODENAME/camera/camera-feature.xml\" \"$WORK_DIR/system/system/cameradata/camera-feature.xml\""
 elif [[ "$SOURCE_PLATFORM_SDK_VERSION" == "$TARGET_PLATFORM_SDK_VERSION" ]]; then
     ADD_TO_WORK_DIR "$TARGET_FIRMWARE" \
         "system" "system/cameradata/camera-feature.xml" 0 0 644 "u:object_r:system_file:s0"
 else
-    _LOG "File not found: $SRC_DIR/target/$TARGET_CODENAME/camera/camera-feature.xml"
+    _LOG "파일이 존재하지 않습니다: $SRC_DIR/target/$TARGET_CODENAME/camera/camera-feature.xml"
 fi
 
 LOG_STEP_IN
 if grep -q "DURING_SMARTVIEW" "$WORK_DIR/system/system/cameradata/camera-feature.xml" 2> /dev/null; then
-    LOG "- Removing Smart View limitations flags"
+    LOG "- 스마트 뷰 제한 플래그 제거 중...."
     EVAL "sed -i \"/DURING_SMARTVIEW/d\" \"$WORK_DIR/system/system/cameradata/camera-feature.xml\""
 fi
 if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_GRAPHICS_SUPPORT_3D_SURFACE_TRANSITION_FLAG")" ]; then
     if grep -q "SUPPORT_LIVE_BLUR" "$WORK_DIR/system/system/cameradata/camera-feature.xml" 2> /dev/null; then
-        LOG "- Removing native blur disable flag"
+        LOG "- 라이브 블러 비활성화 플래그 제거 중..."
         EVAL "sed -i \"/SUPPORT_LIVE_BLUR/d\" \"$WORK_DIR/system/system/cameradata/camera-feature.xml\""
     fi
 fi
 LOG_STEP_OUT
 
-# Samsung Camera "hal3_mass-phone-release" app flavor
+# 삼성 카메라 "hal3_mass-phone-release" 앱 유형
 if ! $SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
     if $TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
         ADD_TO_WORK_DIR "r9qxxx" "system" "system/priv-app/SamsungCamera/SamsungCamera.apk" 0 0 644 "u:object_r:system_file:s0"
@@ -63,12 +62,12 @@ if ! $SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
     fi
 else
     if ! $TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR" "TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR"
     fi
 fi
 
-# Add/delete Snapchat CameraKit Plugin if SHOOTING_MODE_FUN is (not) available
+# SHOOTING_MODE_FUN이 지원되지 않는 (또는 지원되는) 경우 Snapchat CameraKit Plugin을 제거 (또는 추가)
 if [ -f "$WORK_DIR/system/system/app/FunModeSDK/FunModeSDK.apk" ]; then
     if ! grep -q "SHOOTING_MODE_FUN" "$WORK_DIR/system/system/cameradata/camera-feature.xml" 2> /dev/null; then
         DELETE_FROM_WORK_DIR "system" "system/app/FunModeSDK"
@@ -79,13 +78,13 @@ else
     fi
 fi
 
-# Single take "stp1-release" app flavor
+# 싱글테이크 "stp1-release" 앱 유형
 if grep -q "SUPPORT_SINGLE_TAKE_HIGHLIGHT_VIDEOS.*true" "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/cameradata/camera-feature.xml" 2> /dev/null && \
         ! grep -q "SUPPORT_SINGLE_TAKE_HIGHLIGHT_VIDEOS.*true" "$WORK_DIR/system/system/cameradata/camera-feature.xml" 2> /dev/null; then
     ADD_TO_WORK_DIR "a73xqxx" "system" "system/priv-app/SingleTakeService/SingleTakeService.apk" 0 0 644 "u:object_r:system_file:s0"
 elif ! grep -q "SUPPORT_SINGLE_TAKE_HIGHLIGHT_VIDEOS.*true" "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/cameradata/camera-feature.xml" 2> /dev/null && \
         grep -q "SUPPORT_SINGLE_TAKE_HIGHLIGHT_VIDEOS.*true" "$WORK_DIR/system/system/cameradata/camera-feature.xml" 2> /dev/null; then
-    # TODO handle this condition
+    # TODO 이 조건에 대한 패치 추가
     # shellcheck disable=SC2034
     SOURCE_SUPPORT_SINGLE_TAKE_HIGHLIGHT_VIDEOS=false
     # shellcheck disable=SC2034
@@ -104,7 +103,7 @@ if ! grep -q "ENABLE_SINGLE_TAKE_LITE.*true" "$WORK_DIR/system/system/cameradata
                 "etc/singletake/SmartCrop/SmartCrop.tflite" 0 0 644 "u:object_r:vendor_configs_file:s0"
         fi
     else
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         # shellcheck disable=SC2034
         SOURCE_SUPPORT_SMART_CROP=false
         # shellcheck disable=SC2034
@@ -133,7 +132,7 @@ if [ "$SOURCE_CAMERA_CONFIG_ACTION_CLASSIFIER" ]; then
     fi
 else
     if [ "$TARGET_CAMERA_CONFIG_ACTION_CLASSIFIER" ]; then
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_ACTION_CLASSIFIER" "TARGET_CAMERA_CONFIG_ACTION_CLASSIFIER"
     fi
 fi
@@ -154,7 +153,7 @@ if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != "$TARGET_CAMERA_CONFIG_GPPM_SOLU
             DELETE_FROM_WORK_DIR "system" "system/lib64/libstartrail.camera.samsung.so"
         elif [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"startrail"* ]] && \
                 [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"startrail"* ]]; then
-            # TODO handle this condition
+            # TODO 이 조건에 대한 패치 추가
             LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
         fi
         if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"motionclipper"* ]] && \
@@ -162,12 +161,12 @@ if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != "$TARGET_CAMERA_CONFIG_GPPM_SOLU
             DELETE_FROM_WORK_DIR "system" "system/lib64/libdvs.camera.samsung.so"
         elif [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"motionclipper"* ]] && \
                 [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"motionclipper"* ]]; then
-            # TODO handle this condition
+            # TODO 이 조건에 대한 패치 추가
             LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
         fi
     else
         if [ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" ]; then
-            # TODO handle this condition
+            # TODO 이 조건에 대한 패치 추가
             LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
         fi
     fi
@@ -182,7 +181,7 @@ if $SOURCE_CAMERA_SUPPORT_SDK_SERVICE; then
     fi
 else
     if $TARGET_CAMERA_SUPPORT_SDK_SERVICE; then
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_SDK_SERVICE" "TARGET_CAMERA_SUPPORT_SDK_SERVICE"
     fi
 fi
@@ -200,7 +199,7 @@ if $SOURCE_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
     fi
 else
     if $TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_CAMERAX_EXTENSION" "TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION"
     fi
 fi
@@ -217,7 +216,7 @@ if [[ "$SOURCE_GALLERY_CONFIG_PET_CLUSTER_VERSION" != "None" ]]; then
     fi
 else
     if [[ "$TARGET_GALLERY_CONFIG_PET_CLUSTER_VERSION" != "None" ]]; then
-        # TODO handle this condition
+        # TODO 이 조건에 대한 패치 추가
         LOG_MISSING_PATCHES "SOURCE_GALLERY_CONFIG_PET_CLUSTER_VERSION" "TARGET_GALLERY_CONFIG_PET_CLUSTER_VERSION"
     fi
 fi
@@ -232,18 +231,18 @@ if [[ "$SOURCE_SAIV_CONFIG_ARDOODLE_LIB" != "$TARGET_SAIV_CONFIG_ARDOODLE_LIB" ]
             DELETE_FROM_WORK_DIR "system" "system/etc/ardoodle"
         elif [[ "$SOURCE_SAIV_CONFIG_ARDOODLE_LIB" != *"IMG_PICKING"* ]] && \
                 [[ "$TARGET_SAIV_CONFIG_ARDOODLE_LIB" == *"IMG_PICKING"* ]]; then
-            # TODO handle this condition
+            # TODO 이 조건에 대한 패치 추가
             LOG_MISSING_PATCHES "SOURCE_SAIV_CONFIG_ARDOODLE_LIB" "TARGET_SAIV_CONFIG_ARDOODLE_LIB"
         fi
     else
         if [ "$TARGET_SAIV_CONFIG_ARDOODLE_LIB" ]; then
-            # TODO handle this condition
+            # TODO 이 조건에 대한 패치 추가
             LOG_MISSING_PATCHES "SOURCE_SAIV_CONFIG_ARDOODLE_LIB" "TARGET_SAIV_CONFIG_ARDOODLE_LIB"
         fi
     fi
 fi
 
-# Camera libs debloat
+# 사용하지 않는 카메라 라이브러리 제거
 if ! grep -q "\"system\"" "$WORK_DIR/system/system/cameradata/portrait_data/single_bokeh_feature.json" 2> /dev/null; then
     DELETE_FROM_WORK_DIR "system" "system/lib64/libRelighting_API.camera.samsung.so"
 fi
@@ -345,7 +344,7 @@ if [ -f "$WORK_DIR/system/system/lib64/libImageSegmenter_v1.camera.samsung.so" ]
     DELETE_FROM_WORK_DIR "system" "system/lib64/libImageSegmenter_v1.camera.samsung.so"
 fi
 
-# Fix device model number in photo/video metadata
+# 사진/영상 메타데이터에서 디바이스 모델 번호 수정
 while IFS= read -r f; do
     HEX_PATCH "$f" "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
 done < <(grep -r -w -l "ro.product.model" "$WORK_DIR/vendor" | grep "camera")
@@ -354,7 +353,7 @@ HEX_PATCH "$WORK_DIR/system/system/lib/libstagefright.so" \
 HEX_PATCH "$WORK_DIR/system/system/lib64/libstagefright.so" \
     "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
 
-# Fix object capture
+# 오브젝트 캡쳐 수정
 if [[ "$TARGET_OS_SINGLE_SYSTEM_IMAGE" == "essi" ]]; then
     if {
         [[ "$(GET_PROP "system" "ro.product.device")" =~ r0|g0|b0 ]] && \
@@ -376,7 +375,7 @@ if [[ "$TARGET_OS_SINGLE_SYSTEM_IMAGE" == "essi" ]]; then
     fi
 fi
 
-# Fix portrait mode
+# 인물 사진 모드 수정
 if [ -f "$WORK_DIR/vendor/lib64/libDualCamBokehCapture.camera.samsung.so" ]; then
     if grep -q "ro.build.flavor" "$WORK_DIR/vendor/lib64/libDualCamBokehCapture.camera.samsung.so" 2> /dev/null; then
         SET_PROP "system" "ro.build.flavor" "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.build.flavor")"
@@ -393,21 +392,21 @@ if [ -f "$WORK_DIR/vendor/lib64/libDualCamBokehCapture.camera.samsung.so" ]; the
             "726f2e70726f647563742e6e616d6500" "726f2e756e6963612e63616d65726100"
         HEX_PATCH "$WORK_DIR/vendor/lib64/liblivefocus_preview_engine.so" \
             "726f2e70726f647563742e6e616d6500" "726f2e756e6963612e63616d65726100"
-        LOG "- Patching /system/system/etc/selinux/plat_property_contexts"
+        LOG "- /system/system/etc/selinux/plat_property_contexts 패치 중..."
         EVAL "echo \"ro.unica.camera u:object_r:build_prop:s0 exact string\" >> \"$WORK_DIR/system/system/etc/selinux/plat_property_contexts\""
         SET_PROP "system" "ro.unica.camera" "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.product.system.name")"
     fi
 fi
 
-# Enable camera cutout protection
-# Skip patch if SystemUI RRO exists
+# 카메라 컷아웃 보호
+# SystemUI RRO가 존재하는 경우 건너 뜁니다
 if [ ! "$(find "$WORK_DIR/product/overlay" -maxdepth 1 -type f -name "SystemUI*" 2> /dev/null)" ]; then
     if [[ "$SOURCE_CAMERA_SUPPORT_CUTOUT_PROTECTION" != "$TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION" ]]; then
         DECODE_APK "system_ext" "priv-app/SystemUI/SystemUI.apk"
         if $TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION; then
-            LOG "- Enabling camera cutout protection"
+            LOG "- 카메라 컷아웃 보호 활성화 중..."
         else
-            LOG "- Disabling camera cutout protection"
+            LOG "- 카메라 컷아웃 보호 비활성화 중..."
         fi
         EVAL "sed -i \"s/config_enableDisplayCutoutProtection\\\">$SOURCE_CAMERA_SUPPORT_CUTOUT_PROTECTION/config_enableDisplayCutoutProtection\\\">$TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION/\" \"$APKTOOL_DIR/system_ext/priv-app/SystemUI/SystemUI.apk/res/values/bools.xml\""
     fi

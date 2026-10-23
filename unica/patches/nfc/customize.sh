@@ -26,10 +26,10 @@ if [ "$(GET_PROP "vendor" "ro.vendor.nfc.feature.chipname")" ]; then
 fi
 
 # SEC_PRODUCT_FEATURE_NFC_CHIP_NAME:=NXP_SN100U/NXP_PN553
-# - API 35 and below: libnfc_nxpsn_jni.so/libnfc_nxppn_jni.so
+# - API 35 또는 그 이하: libnfc_nxpsn_jni.so/libnfc_nxppn_jni.so
 # - API 36: libnfc_nci_jni.so
 #
-# Use NXP_SN100U blobs for devices with legacy NXP_PN553 impl.
+# 기존 NXP_PN553 구현이 적용된 기기에 대해 NXP_SN100U 블롭 사용
 if [ -f "$WORK_DIR/system/system/lib/libnfc_nci_jni.so" ]; then
     if [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib/libnfc_nci_jni.so" ] && \
             [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib64/libnfc_nxppn_jni.so" ] && \
@@ -72,7 +72,7 @@ elif [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib64/libnfc_nxpsn_jni.so
 fi
 
 # SEC_PRODUCT_FEATURE_NFC_CHIP_NAME:=STM_ST21
-# - API 35 and below: libnfc_st_jni.so
+# - API 35 또는 그 이하: libnfc_st_jni.so
 # - API 36: libstnfc_nci_jni.so
 if [ -f "$WORK_DIR/system/system/lib/libstnfc_nci_jni.so" ]; then
     if [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib/libstnfc_nci_jni.so" ] && \
@@ -102,7 +102,7 @@ elif [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib64/libnfc_st_jni.so" ]
 fi
 
 # SEC_PRODUCT_FEATURE_NFC_CHIP_NAME:=SLSI
-# - Same lib name as before, check for TARGET_PLATFORM_SDK_VERSION instead
+# - 이전과 동일한 라이브러리 이름을 사용하지만, TARGET_PLATFORM_SDK_VERSION 확인
 if [ -f "$WORK_DIR/system/system/lib/libnfc_sec_jni.so" ]; then
     if [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib/libnfc_sec_jni.so" ] && \
             [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/lib64/libnfc_sec_jni.so" ] && \
