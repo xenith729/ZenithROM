@@ -345,7 +345,7 @@ SMALI_PATCH() {
     # 메서드 내부의 문자열을 다른 문자열로 대체
     # 또는 메서드 내부의 행을 다른 행으로 대체
     elif [[ "$OPERATION" == "replace" ]]; then
-        LOG "- "/$PARTITION/$FILE/$SMALI"에서 $METHOD 메서드의 $VALUE 값을 $REPLACEMENT 값으로 교체 중"
+        LOG "- "/$PARTITION/$FILE/$SMALI"에서 $METHOD 메서드의 $VALUE 값을 $REPLACEMENT 값으로 교체 중..."
 
         awk -v FN="$METHOD" -v STR="$VALUE" -v REP="$REPLACEMENT" '
             BEGIN { inside = 0; isline = (index(REP, "\n") > 0) }

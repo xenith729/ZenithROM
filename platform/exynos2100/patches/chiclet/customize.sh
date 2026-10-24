@@ -24,7 +24,7 @@ KERNEL_ARCHIVE="$(
 DOWNLOAD_FILE "$KERNEL_DL_BASE/$KERNEL_ARCHIVE" "$TMP_DIR/$KERNEL_ARCHIVE"
 
 for i in "boot" "dtbo" "vendor_boot"; do
-    LOG "- $i.img 추가 중.,.."
+    LOG "- $i.img 추가 중..."
 
     EVAL "unzip -o \"$TMP_DIR/$KERNEL_ARCHIVE\" \"files/$i.img\" -d \"$TMP_DIR\""
 

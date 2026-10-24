@@ -82,7 +82,7 @@ DECODE() {
         exit 1
     fi
 
-    LOG "- ${INPUT_FILE//$WORK_DIR/} 디코딩 중"
+    LOG "- ${INPUT_FILE//$WORK_DIR/} 디코딩 중..."
 
     # --no-debug-info 옵션으로 APK를 디코딩하며, 이 옵션은 다음 플래그를 사용하여 DEX 파일을 역어셈블(디스어셈블)합니다:
     # - 합성 접근자(synthetic accessors) 주석 비활성화

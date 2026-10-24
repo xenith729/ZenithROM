@@ -1,6 +1,6 @@
 # 앱 압축 비활성화
 # 원본 펌웨어에서 이 기능이 이미 비활성화되어 있을 수 있으므로 패치 적용 여부 확인
-LOG "- /system/system/framework/services.jar에 \"앱 압축 비활성화\" 적용 중"
+LOG "- /system/system/framework/services.jar에 \"앱 압축 비활성화\" 적용 중..."
 APPLY_PATCH "system" "system/framework/services.jar" \
     "$MODPATH/appcompactor/services.jar/0001-Disable-app-compaction.patch" | true \
     > /dev/null

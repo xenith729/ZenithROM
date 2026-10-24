@@ -145,7 +145,7 @@ for i in "${FIRMWARES[@]}"; do
         fi
     fi
 
-    LOG "- 펌웨어 다운로드 중......"
+    LOG "- 펌웨어 다운로드 중..."
     [ -f "$ODIN_DIR/${MODEL}_${CSC}/.downloaded" ] && rm -rf "$ODIN_DIR/${MODEL}_${CSC}"
     mkdir -p "$ODIN_DIR/${MODEL}_${CSC}"
     # Anan의 samloader는 로그 파일을 현재 작업 중인 디렉토리에 저장합니다, 따라서 잠시 OUT_DIR로 이동합니다.

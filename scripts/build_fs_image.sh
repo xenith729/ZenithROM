@@ -462,7 +462,7 @@ if [ ! "$IMAGE_SIZE" ]; then
     LOG_STEP_OUT
 fi
 
-LOG "- 이미지 빌드 중"
+LOG "- 이미지 빌드 중..."
 if [ ! -f "$OUTPUT_FILE" ]; then
     if $AVB_SIGN; then
         IMAGE_SIZE="$(CALCULATE_AVB_MAX_IMAGE_SIZE "$IMAGE_SIZE")" BUILD_IMAGE_MKFS
@@ -472,7 +472,7 @@ if [ ! -f "$OUTPUT_FILE" ]; then
 fi
 
 if $AVB_SIGN; then
-    LOG "- 이미지에 AVB 서명 중"
+    LOG "- 이미지에 AVB 서명 중..."
     EVAL "$(GET_AVBTOOL_CMD)" || exit 1
 fi
 
