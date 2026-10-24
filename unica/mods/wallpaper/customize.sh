@@ -23,7 +23,7 @@ COMPRESS_WEBP() {
         fi
     fi
 
-    LOG "- ?? ?: $FILE_NAME"
+    LOG "- $FILE_NAME 추가 중..."
 
     CMD="cwebp"
     CMD+=" -q 100"
@@ -49,7 +49,7 @@ ENCODE_MP4() {
         RES="1440:-1"
     fi
 
-    LOG "- ??? ?: $FILE_NAME"
+    LOG "- $FILE_NAME 인코딩 중..."
 
     CMD="ffmpeg"
     CMD+=" -i \"$FILE_PATH/$FILE_NAME\""
