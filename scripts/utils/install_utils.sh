@@ -126,16 +126,8 @@ PRINT_BUILD_INFO() {
     grep "^device" <<< "$TARGET_BUILD_INFO" | cut -d "=" -f 2 -s
     echo -n "version="
     grep "^version" <<< "$TARGET_BUILD_INFO" | cut -d "=" -f 2 -s
-    echo -n "timestamp="
-    grep "^timestamp" <<< "$TARGET_BUILD_INFO" | cut -d "=" -f 2 -s
     echo -n "security_patch_version="
     grep "^security_patch" <<< "$TARGET_BUILD_INFO" | cut -d "=" -f 2 -s
-    echo -n "incremental="
-    if [ "$SOURCE_BUILD_INFO" ]; then
-        grep "^timestamp" <<< "$SOURCE_BUILD_INFO" | cut -d "=" -f 2 -s
-    else
-        echo "0"
-    fi
 }
 
 # PRINT_HEADER <정보>

@@ -23,9 +23,6 @@ GENERATE_OTA_INFO() {
 
     {
         echo    '    {'
-        echo -n '      "datetime": '
-        echo -n "$(grep "^timestamp" <<< "$BUILD_INFO" | cut -d "=" -f 2)"
-        echo    ','
         echo -n '      "device": "'
         echo -n "$(grep "^device" <<< "$BUILD_INFO" | cut -d "=" -f 2 -s)"
         echo    '",'
