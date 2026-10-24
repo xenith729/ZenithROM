@@ -175,12 +175,6 @@ ADD_TO_WORK_DIR "pa2qxxx" "vendor" "etc/petdetector/studio_pd/studio_pd_cnn.info
 ADD_TO_WORK_DIR "pa2qxxx" "vendor" "etc/petdetector/studio_pd/studio_pd_cnn.tflite" 0 0 644 "u:object_r:vendor_configs_file:s0"
 LOG_STEP_OUT
 
-# Galaxy AI - 날씨 및 시간 배경화면
-LOG_STEP_IN "- Galaxy AI 기능에서 날씨 및 시간 배경화면 지원 활성화 중..."
-SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_LOCKSCREEN_CONFIG_WALLPAPER_STYLE" "VIDEO,GENWEATHER,FLIPSUIT_LOCK"
-SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_GENAI_SUPPORT_TIME_WEATHER_WALLPAPER" "V2"
-LOG_STEP_OUT
-
 # 디바이스 케어 - 성능 모드
 LOG_STEP_IN "- 디바이스 케어 기능에서 사용 유형별 성능 선택 지원 활성화 중..."
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_SYSTEM_SUPPORT_ENHANCED_CPU_RESPONSIVENESS" --delete
