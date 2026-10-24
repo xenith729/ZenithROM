@@ -48,6 +48,16 @@ if [ -f "$WORK_DIR/system/system/etc/init/perfetto.rc" ]; then
     SET_PROP_IF_DIFF "system" "persist.traced.enable" "0"
 fi
 
+# 로그 비활성화
+if ! $DEBUG; then
+    SET_PROP "system" "logcat.live" "disable"
+    SET_PROP "system" "profiler.force_disable_err_rpt" "1"
+    SET_PROP "system" "profiler.force_disable_ulog" "1"
+    SET_PROP "system" "ro.kernel.checkjni" "0"
+    SET_PROP "system" "ro.kernel.android.checkjni" "0"
+    SET_PROP "system" "persist.android.strictmode" "0"
+fi
+
 # ROM 프롭 지정
 VALUE="$(GET_PROP "$WORK_DIR/system/system/build.prop" "ro.build.display.id")"
 SET_PROP "system" "ro.build.display.id" "ZenithROM $ROM_VERSION for $TARGET_CODENAME ($VALUE)"
@@ -59,6 +69,8 @@ EVAL "echo \"ro.zenith.device u:object_r:build_prop:s0 exact string\" >> \"$WORK
 # build.prop 트윅
 SET_PROP_IF_DIFF "vendor" "ro.incremental.enable" "yes"
 SET_PROP_IF_DIFF "vendor" "ro.apk_verity.mode" "2"
+SET_PROP_IF_DIFF "system" "ro.config.hw_quickpoweron" "true"
 SET_PROP_IF_DIFF "system" "persist.device_config.activity_manager_native_boot.use_freezer" "true"
 SET_PROP_IF_DIFF "system" "persist.device_config.runtime_native_boot.iorap_perfetto_enable" "true"
 SET_PROP_IF_DIFF "system" "persist.sys.fuse.passthrough.enable" "true"
+SET_PROP_IF_DIFF "system" "persist.sys.shutdown.mode" "hibernate"
