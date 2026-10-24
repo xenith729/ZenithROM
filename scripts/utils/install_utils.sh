@@ -175,7 +175,6 @@ PRINT_HEADER() {
     echo -n "ZenithROM $ROM_VERSION for $TARGET_NAME"
     echo    '");'
     echo    'ui_print("ZenithROM developed by Xenith");'
-    echo    '");'
     echo    'ui_print("UN1CA developed by salvo_giangri @XDAforums");'
     PRINT_SEPARATOR
     echo -n 'ui_print("'
