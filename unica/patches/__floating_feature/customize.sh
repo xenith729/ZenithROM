@@ -154,7 +154,7 @@ APPLY_TARGET_FEATURE() {
             continue
         fi
 
-        if [[ "$l" != "    \<SEC_FLOATING_FEATURE_"*"</SEC_FLOATING_FEATURE_"*">" ]]; then
+        if [[ "$l" != "    <SEC_FLOATING_FEATURE_"*"</SEC_FLOATING_FEATURE_"*">" ]]; then
             ABORT "잘못된 형식의 문자열입니다: ${SOURCE_FILE//$SRC_DIR\//}: \"$l\""
         fi
 
@@ -184,7 +184,7 @@ APPLY_TARGET_FEATURE() {
             continue
         fi
 
-        if [[ "$l" != "    \<SEC_FLOATING_FEATURE_"*"</SEC_FLOATING_FEATURE_"*">" ]]; then
+        if [[ "$l" != "    <SEC_FLOATING_FEATURE_"*"</SEC_FLOATING_FEATURE_"*">" ]]; then
             ABORT "잘못된 형식의 문자열입니다: ${TARGET_FILE//$SRC_DIR\//}: \"$l\""
         fi
 
