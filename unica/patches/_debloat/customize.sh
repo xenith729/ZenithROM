@@ -20,7 +20,7 @@ fi
 for file in \
     "$SRC_DIR/unica/debloat.sh" \
     "$SRC_DIR/platform/$TARGET_PLATFORM/debloat.sh" \
-    "$SRC_DIR/taerget/$TARGET_CODENAME/debloat.sh"
+    "$SRC_DIR/target/$TARGET_CODENAME/debloat.sh"
 do
     if [ -f "$file" ]; then
         source "$file"
